@@ -8,7 +8,7 @@ import (
 
 type UserModel struct {
 	gorm.Model
-	ID        string    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	Email     string    `json:"email" gorm:"unique;not null"`
 	Password  string    `json:"password"`
 	FirstName string    `json:"first_name" gorm:"size:255"`

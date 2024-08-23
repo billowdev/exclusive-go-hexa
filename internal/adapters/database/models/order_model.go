@@ -6,18 +6,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type OrderModel struct {
+type Order struct {
 	gorm.Model
-	ID                 string    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
-	PortOfLoading      string    `json:"port_of_loading"`
-	PortOfDestination  string    `json:"port_of_destination"`
-	DescriptionOfGoods string    `json:"description_of_goods"`
-	CreatedAt          time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt          time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	ID                 uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	OrderType          string         `gorm:"orderType" json:"orderType"`
+	CreatedAt          time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt          time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt          gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	PortOfLoading      string         `json:"port_of_loading"`
+	PortOfDestination  string         `json:"port_of_destination"`
+	DescriptionOfGoods string         `json:"description_of_goods"`
 }
 
 var TNOrder = "orders"
 
-func (st *OrderModel) TableName() string {
+func (st *Order) TableName() string {
 	return TNOrder
 }

@@ -6,35 +6,113 @@ import (
 	"gorm.io/gorm"
 )
 
-type DocumentModel struct {
+type Document struct {
 	gorm.Model
-	ID           string     `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
-	DocumentName string     `json:"document_name"`
-	Issuer       string     `json:"issuer"`
-	OrderID      string     `json:"order_id"`
-	Order        OrderModel `gorm:"foreignkey:OrderID"`
-	CreatedAt    time.Time  `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt    time.Time  `gorm:"autoUpdateTime" json:"updated_at"`
+	ID           uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	CreatedAt    time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt    time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	DocumentName string         `json:"document_name"`
+	Issuer       string         `json:"issuer"`
+	OrderID      string         `json:"order_id"`
+	Order        Order          `gorm:"foreignkey:OrderID"`
 }
 
 var TNDocument = "documents"
 
-func (st *DocumentModel) TableName() string {
+func (st *Document) TableName() string {
 	return TNDocument
 }
 
-type DocumentVersionModel struct {
+type DocumentTemplate struct {
+	ID        uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+
+	DocumentName    string  `json:"document_name"`
+	TemplateVersion float64 `json:"template_version"`
+	IsDefault       bool    `json:"is_default"`
+	IsEnable        bool    `json:"is_enable"`
+}
+
+var TNDocumentTemplate = "document_template"
+
+func (st *DocumentTemplate) TableName() string {
+	return TNDocumentTemplate
+}
+
+type DocumentVersion struct {
 	gorm.Model
-	ID            string        `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
-	DocumentID    string        `json:"document_id"`
-	Document      DocumentModel `gorm:"foreignkey:DocumentID"`
-	VersionNumber int           `json:"version_number"`
-	CreatedAt     time.Time     `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt     time.Time     `gorm:"autoUpdateTime" json:"updated_at"`
+	ID         uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	CreatedAt  time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt  time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	DocumentID uint           `json:"document_id"`
+	Document   Document       `gorm:"foreignkey:DocumentID"`
+
+	DocumentTemplateID string           `json:"document_template_id"`
+	DocumentTemplate   DocumentTemplate `gorm:"foreignkey:DocumentTemplateID"`
+
+	VersionNumber int `json:"version_number"`
 }
 
 var TNDocumentVersion = "document_versions"
 
-func (st *DocumentVersionModel) TableName() string {
+func (st *DocumentVersion) TableName() string {
 	return TNDocumentVersion
+}
+
+type DocumentTemplateField struct {
+	gorm.Model
+	ID                 uint             `gorm:"primaryKey;autoIncrement" json:"id"`
+	CreatedAt          time.Time        `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt          time.Time        `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt          gorm.DeletedAt   `gorm:"index" json:"deleted_at,omitempty"`
+	DocumentTemplateID uint             `json:"document_template_id"`
+	DocumentTemplate   DocumentTemplate `gorm:"foreignkey:DocumentTemplateID"`
+	SystemFieldID      uint             `json:"system_field_id"`
+	SystemField        SystemField      `gorm:"foreignkey:SystemFieldID"`
+}
+
+type DocumentVersionFieldValue struct {
+	gorm.Model
+	ID        uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+
+	DocumentVersionID uint            `json:"document_version_id"`
+	DocumentVersion   DocumentVersion `gorm:"foreignkey:DocumentVersionID"`
+
+	DocumentTemplateFieldID uint                  `json:"document_template_field_id"`
+	DocumentTemplateField   DocumentTemplateField `gorm:"foreignkey:DocumentTemplateFieldID"`
+}
+
+var TNDocumentVersionFieldValue = "document_version_field_value"
+
+func (st *DocumentVersionFieldValue) TableName() string {
+	return TNDocumentVersionFieldValue
+}
+
+type LogDocumentVersionFieldValue struct {
+	gorm.Model
+	ID        uint           `gorm:"primaryKey;autoIncrement" json:"id"`
+	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+
+	DocumentVersionFieldValueID uint                      `json:"document_version_field_value_id"`
+	DocumentVersionFieldValue   DocumentVersionFieldValue `gorm:"foreignkey:DocumentVersionFieldValueID"`
+	MasterFileID                uint                      `json:"master_file_id"`
+	MasterFile                  MasterFile                `gorm:"foreignkey:MasterFileID"`
+
+	PreviousValue string `json:"previous_value"`
+	ModifiedValue string `json:"modified_value"`
+}
+
+var TNLogDocumentVersionFieldValue = "log_document_version_field_value"
+
+func (st *LogDocumentVersionFieldValue) TableName() string {
+	return TNLogDocumentVersionFieldValue
 }
