@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
 	ports "github.com/billowdev/document-system-field-manager/internal/core/ports/system_fields"
@@ -37,8 +38,12 @@ func (s *SystemFieldImpls) HandleCreateSystemField(c *fiber.Ctx) error {
 	if err := c.BodyParser(&payload); err != nil {
 		return utils.NewErrorResponse(c, "Invalid request payload", err.Error())
 	}
-
-	res := s.systemFieldService.CreateSystemField(c.Context(), &payload)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return c.Context().Err()
+	}
+	res := s.systemFieldService.CreateSystemField(ctx, &payload)
 	return c.JSON(res)
 }
 
@@ -48,8 +53,12 @@ func (s *SystemFieldImpls) HandleDeleteSystemField(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.NewErrorResponse(c, "Invalid ID", err.Error())
 	}
-
-	res := s.systemFieldService.DeleteSystemField(c.Context(), uint(id))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return c.Context().Err()
+	}
+	res := s.systemFieldService.DeleteSystemField(ctx, uint(id))
 	return c.JSON(res)
 }
 
@@ -59,7 +68,12 @@ func (s *SystemFieldImpls) HandleUpdateSystemField(c *fiber.Ctx) error {
 	if err := c.BodyParser(&payload); err != nil {
 		return utils.NewErrorResponse(c, "Invalid request payload", err.Error())
 	}
-	res := s.systemFieldService.UpdateSystemField(c.Context(), &payload)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return c.Context().Err()
+	}
+	res := s.systemFieldService.UpdateSystemField(ctx, &payload)
 	return c.JSON(res)
 }
 
@@ -69,14 +83,22 @@ func (s *SystemFieldImpls) HandleGetSystemField(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.NewErrorResponse(c, "Invalid ID", err.Error())
 	}
-
-	res := s.systemFieldService.GetSystemField(c.Context(), uint(id))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return c.Context().Err()
+	}
+	res := s.systemFieldService.GetSystemField(ctx, uint(id))
 	return c.JSON(res)
 }
 
 // HandleGetSystemFields implements ISystemFieldHandler.
 func (s *SystemFieldImpls) HandleGetSystemFields(c *fiber.Ctx) error {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return c.Context().Err()
+	}
 	params := pagination.NewPaginationParams[filters.SystemFieldFilter](c)
 	paramCtx := pagination.SetFilters(ctx, params)
 	res := s.systemFieldService.GetSystemFields(paramCtx)
