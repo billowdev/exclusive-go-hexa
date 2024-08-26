@@ -3,11 +3,11 @@ package repositories
 import (
 	"context"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database"
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	ports "github.com/billowdev/document-system-field-manager/internal/core/ports/system_fields"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/filters"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
+	ports "github.com/billowdev/exclusive-go-hexa/internal/core/ports/system_fields"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/filters"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/pagination"
 	"gorm.io/gorm"
 )
 

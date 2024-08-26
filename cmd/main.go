@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/app"
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database"
-	"github.com/billowdev/document-system-field-manager/pkg/configs"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/app"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
+	"github.com/billowdev/exclusive-go-hexa/pkg/configs"
 )
 
 func main() {

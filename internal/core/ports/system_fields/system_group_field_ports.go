@@ -3,10 +3,10 @@ package ports
 import (
 	"context"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/filters"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
-	"github.com/billowdev/document-system-field-manager/pkg/utils"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/filters"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/pagination"
+	"github.com/billowdev/exclusive-go-hexa/pkg/utils"
 )
 
 type ISystemGroupFieldRepository interface {

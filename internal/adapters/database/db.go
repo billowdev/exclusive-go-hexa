@@ -4,24 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/seeders"
-	"github.com/billowdev/document-system-field-manager/pkg/configs"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/seeders"
+	"github.com/billowdev/exclusive-go-hexa/pkg/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-// https://www.kaznacheev.me/posts/en/clean-transactions-in-hexagon/
+// Idea https://www.kaznacheev.me/posts/en/clean-transactions-in-hexagon/
 type txKey struct{}
 
 // injectTx injects the transaction into the context
-func  InjectTx(ctx context.Context, tx *gorm.DB) context.Context {
+func InjectTx(ctx context.Context, tx *gorm.DB) context.Context {
 	return context.WithValue(ctx, txKey{}, tx)
 }
 
 // extractTx extracts the transaction from the context
-func  ExtractTx(ctx context.Context) *gorm.DB {
+func ExtractTx(ctx context.Context) *gorm.DB {
 	if tx, ok := ctx.Value(txKey{}).(*gorm.DB); ok {
 		return tx
 	}

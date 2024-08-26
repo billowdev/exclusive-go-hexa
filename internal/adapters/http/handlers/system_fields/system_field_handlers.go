@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	ports "github.com/billowdev/document-system-field-manager/internal/core/ports/system_fields"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/filters"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
-	"github.com/billowdev/document-system-field-manager/pkg/utils"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
+	ports "github.com/billowdev/exclusive-go-hexa/internal/core/ports/system_fields"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/filters"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/pagination"
+	"github.com/billowdev/exclusive-go-hexa/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 )
 

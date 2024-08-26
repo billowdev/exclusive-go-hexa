@@ -3,13 +3,13 @@ package services
 import (
 	"context"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database"
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	domain "github.com/billowdev/document-system-field-manager/internal/core/domain/system_fields"
-	ports "github.com/billowdev/document-system-field-manager/internal/core/ports/system_fields"
-	"github.com/billowdev/document-system-field-manager/pkg/configs"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
-	"github.com/billowdev/document-system-field-manager/pkg/utils"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
+	domain "github.com/billowdev/exclusive-go-hexa/internal/core/domain/system_fields"
+	ports "github.com/billowdev/exclusive-go-hexa/internal/core/ports/system_fields"
+	"github.com/billowdev/exclusive-go-hexa/pkg/configs"
+	"github.com/billowdev/exclusive-go-hexa/pkg/helpers/pagination"
+	"github.com/billowdev/exclusive-go-hexa/pkg/utils"
 )
 
 type SystemFieldServiceImpls struct {

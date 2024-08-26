@@ -1,7 +1,7 @@
 package seeders
 
 import (
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
 	"gorm.io/gorm"
 )
 

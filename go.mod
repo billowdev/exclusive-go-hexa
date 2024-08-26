@@ -1,4 +1,4 @@
-module github.com/billowdev/document-system-field-manager
+module github.com/billowdev/exclusive-go-hexa
 
 go 1.22.1
 

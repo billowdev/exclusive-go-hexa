@@ -12,7 +12,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"

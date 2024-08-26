@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/billowdev/document-system-field-manager/internal/adapters/database"
-	handlers "github.com/billowdev/document-system-field-manager/internal/adapters/http/handlers/system_fields"
-	"github.com/billowdev/document-system-field-manager/internal/adapters/http/routers"
-	repositories "github.com/billowdev/document-system-field-manager/internal/adapters/repositories/system_fields"
-	services "github.com/billowdev/document-system-field-manager/internal/core/services/system_fields"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
+	handlers "github.com/billowdev/exclusive-go-hexa/internal/adapters/http/handlers/system_fields"
+	"github.com/billowdev/exclusive-go-hexa/internal/adapters/http/routers"
+	repositories "github.com/billowdev/exclusive-go-hexa/internal/adapters/repositories/system_fields"
+	services "github.com/billowdev/exclusive-go-hexa/internal/core/services/system_fields"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
