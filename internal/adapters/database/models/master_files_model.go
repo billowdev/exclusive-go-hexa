@@ -31,7 +31,7 @@ type SystemGroupField struct {
 	CreatedAt   time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
-	GroupName   string         `json:"group_name"`
+	Name        string         `json:"name"`
 	Description string         `json:"description"`
 }
 
@@ -46,10 +46,16 @@ type ConfigSystemMasterFileField struct {
 	CreatedAt          time.Time        `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt          time.Time        `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt          gorm.DeletedAt   `gorm:"index" json:"deleted_at,omitempty"`
-	SystemFieldID      string           `json:"system_field_id"`
+	SystemFieldID      uint             `json:"system_field_id"`
 	SystemField        SystemField      `gorm:"foreignkey:SystemFieldID"`
-	SystemGroupFieldID string           `json:"system_group_field_id"`
+	SystemGroupFieldID uint             `json:"system_group_field_id"`
 	SystemGroupField   SystemGroupField `gorm:"foreignkey:SystemGroupFieldID"`
+}
+
+var TNConfigSystemMasterFileField = "config_system_master_file_fields"
+
+func (st *ConfigSystemMasterFileField) TableName() string {
+	return TNConfigSystemMasterFileField
 }
 
 type MasterFile struct {
@@ -58,6 +64,8 @@ type MasterFile struct {
 	CreatedAt     time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	OrderID       uint           `json:"order_id"`
+	Order         Order          `gorm:"foreignkey:OrderID"`
 	SystemFieldID uint           `json:"system_field_id"`
 	SystemField   SystemField    `gorm:"foreignkey:SystemFieldID"`
 	Value         string         `json:"value"`
@@ -76,7 +84,7 @@ type LogMasterFile struct {
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 	MasterFileID  uint           `json:"master_file_id"`
 	MasterFile    MasterFile     `gorm:"foreignkey:MasterFileID"`
-	PreviousValue string         `json:"previous_value"`
+	PreviousValue *string        `json:"previous_value"`
 	ModifiedValue string         `json:"modified_value"`
 }
 

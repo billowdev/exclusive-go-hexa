@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
+	"github.com/billowdev/document-system-field-manager/internal/adapters/database/seeders"
 	"github.com/billowdev/document-system-field-manager/pkg/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -53,7 +54,79 @@ func NewDatabase() (*gorm.DB, error) {
 }
 
 func RunSeeds(db *gorm.DB) {
+	_ = seeders.SEED_ORDER
+	seeders.SeedOrder(db)
+	seeders.SeedSystemField(db)
+	seeders.SeedGroupField(db)
+	seeders.SeedConfigSystemMasterFileField(db)
+	seeders.SeedMasterFile(db)
+	seeders.SeedLogMasterFile(db)
+	seeders.SeedDocument(db)
+	seeders.SeedDocumentTemplate(db)
+	seeders.SeedDocumentTemplateField(db)
+	seeders.SeedDocumentVersion(db)
+	seeders.SeedDocumentVersionFieldValue(db)
+	seeders.SeedLogDocumentVersionFieldValue(db)
+}
 
+func resetSeeder(db *gorm.DB) error {
+	if err := helperDeleteInfo(db, models.TNConfigSystemMasterFileField); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNLogMasterFile); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNLogDocumentVersionFieldValue); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNMasterFile); err != nil {
+		return err
+	}
+	if err := helperDeleteInfo(db, models.TNDocumentVersionFieldValue); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNDocumentVersion); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNDocumentTemplateField); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNDocumentTemplate); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNDocument); err != nil {
+		return err
+	}
+	if err := helperDeleteInfo(db, models.TNOrder); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNSystemField); err != nil {
+		return err
+	}
+
+	if err := helperDeleteInfo(db, models.TNSystemGroupField); err != nil {
+		return err
+	}
+	return nil
+}
+func helperDeleteInfo(db *gorm.DB, table string) error {
+	err := db.Exec(fmt.Sprintf("DELETE FROM %s", table)).Error
+	if err != nil {
+		return err
+	}
+	err = db.Exec(fmt.Sprintf("SELECT setval('%s_id_seq', 1, false)", table)).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func RunMigrations(db *gorm.DB) error {
@@ -62,6 +135,7 @@ func RunMigrations(db *gorm.DB) error {
 		if err != nil {
 			return err
 		}
+
 		err = tx.AutoMigrate(
 			// TODO START USER
 			&models.Order{},
@@ -77,6 +151,13 @@ func RunMigrations(db *gorm.DB) error {
 			&models.DocumentVersionFieldValue{},
 			&models.LogDocumentVersionFieldValue{},
 		)
+		if err != nil {
+			return err
+		}
+		err = resetSeeder(db)
+		if err != nil {
+			return err
+		}
 		return err
 	})
 

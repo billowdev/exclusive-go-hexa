@@ -8,12 +8,12 @@ init: tidy run
 
 # Tidy up Go modules
 tidy:
-    go mod tidy
+	go mod tidy
 
 # Build the Go application
 build:
-    go build -o bin/main ./cmd/main.go
+	go build -o bin/main ./cmd/main.go
 
 # Run the Go application
 run: $(MODULES)
-    go run ./cmd/main.go
+	go run ./cmd/main.go

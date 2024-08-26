@@ -9,7 +9,7 @@ import (
 type Order struct {
 	gorm.Model
 	ID                 uint           `gorm:"primaryKey;autoIncrement" json:"id"`
-	OrderType          string         `gorm:"orderType" json:"orderType"`
+	OrderType          string         `gorm:"orderType" json:"order_type"`
 	CreatedAt          time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt          time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt          gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
