@@ -17,3 +17,6 @@ build:
 # Run the Go application
 run: $(MODULES)
 	go run ./cmd/main.go
+
+test:
+	go test ./... -cover

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
+	domain "github.com/billowdev/document-system-field-manager/internal/core/domain/system_fields"
 	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
 	"github.com/billowdev/document-system-field-manager/pkg/utils"
 )
@@ -18,7 +19,7 @@ type ISystemFieldRepository interface {
 
 type ISystemFieldService interface {
 	GetSystemField(ctx context.Context, id uint) utils.APIResponse
-	GetSystemFields(ctx context.Context) pagination.Pagination[[]models.SystemField]
+	GetSystemFields(ctx context.Context) pagination.Pagination[[]domain.SystemFieldDomain]
 	CreateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse
 	UpdateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse
 	DeleteSystemField(ctx context.Context, id uint) utils.APIResponse

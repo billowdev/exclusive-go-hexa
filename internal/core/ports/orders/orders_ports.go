@@ -1,6 +1,8 @@
 package ports
 
 import (
+	"context"
+
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
 	"github.com/billowdev/document-system-field-manager/pkg/helpers/filters"
 	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
@@ -8,17 +10,17 @@ import (
 )
 
 type IOrderRepository interface {
-	GetOrder(id uint) (*models.Order, error)
-	GetOrders(p pagination.PaginationParams[filters.OrderFilter]) (*pagination.Pagination[[]models.Order], error)
-	CreateOrder(payload *models.Order) error
-	UpdateOrder(payload *models.Order) error
-	DeleteOrder(id uint) error
+	GetOrder(ctx context.Context, id uint) (*models.Order, error)
+	GetOrders(ctx context.Context, p pagination.PaginationParams[filters.OrderFilter]) (*pagination.Pagination[[]models.Order], error)
+	CreateOrder(ctx context.Context, payload *models.Order) error
+	UpdateOrder(ctx context.Context, payload *models.Order) error
+	DeleteOrder(ctx context.Context, id uint) error
 }
 
 type IOrderService interface {
-	GetOrder(id uint) utils.APIResponse
-	GetOrders(p pagination.PaginationParams[filters.OrderFilter]) pagination.Pagination[[]models.Order]
-	CreateOrder(payload *models.Order) utils.APIResponse
-	UpdateOrder(payload *models.Order) utils.APIResponse
-	DeleteOrder(id uint) utils.APIResponse
+	GetOrder(ctx context.Context, id uint) utils.APIResponse
+	GetOrders(ctx context.Context, p pagination.PaginationParams[filters.OrderFilter]) pagination.Pagination[[]models.Order]
+	CreateOrder(ctx context.Context, payload *models.Order) utils.APIResponse
+	UpdateOrder(ctx context.Context, payload *models.Order) utils.APIResponse
+	DeleteOrder(ctx context.Context, id uint) utils.APIResponse
 }

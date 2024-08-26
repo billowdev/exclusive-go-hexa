@@ -2,9 +2,9 @@ package app
 
 import (
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database"
+	handlers "github.com/billowdev/document-system-field-manager/internal/adapters/http/handlers/system_fields"
+	"github.com/billowdev/document-system-field-manager/internal/adapters/http/routers"
 	repositories "github.com/billowdev/document-system-field-manager/internal/adapters/repositories/system_fields"
-	handlers "github.com/billowdev/document-system-field-manager/internal/adapters/rest/handlers/system_fields"
-	"github.com/billowdev/document-system-field-manager/internal/adapters/rest/routers"
 	services "github.com/billowdev/document-system-field-manager/internal/core/services/system_fields"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"

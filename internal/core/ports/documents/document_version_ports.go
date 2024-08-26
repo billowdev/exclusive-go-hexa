@@ -1,26 +1,25 @@
 package ports
 
 import (
+	"context"
+
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/filters"
 	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
 	"github.com/billowdev/document-system-field-manager/pkg/utils"
-	"gorm.io/gorm"
 )
 
 type IDocumentVersionRepository interface {
-	BeginTransaction() *gorm.DB
-	GetDocumentVersion(id uint) (*models.DocumentVersion, error)
-	GetDocumentVersions(p pagination.PaginationParams[filters.DocumentVersionFilter]) (*pagination.Pagination[[]models.DocumentVersion], error)
-	CreateDocumentVersion(payload *models.DocumentVersion) error
-	UpdateDocumentVersion(payload *models.DocumentVersion) error
-	DeleteDocumentVersion(id uint) error
+	GetDocumentVersion(ctx context.Context, id uint) (*models.DocumentVersion, error)
+	GetDocumentVersions(ctx context.Context) (*pagination.Pagination[[]models.DocumentVersion], error)
+	CreateDocumentVersion(ctx context.Context, payload *models.DocumentVersion) error
+	UpdateDocumentVersion(ctx context.Context, payload *models.DocumentVersion) error
+	DeleteDocumentVersion(ctx context.Context, id uint) error
 }
 
 type IDocumentVersionService interface {
-	GetDocumentVersion(id uint) utils.APIResponse
-	GetDocumentVersions(p pagination.PaginationParams[filters.DocumentVersionFilter]) pagination.Pagination[[]models.DocumentVersion]
-	CreateDocumentVersion(payload *models.DocumentVersion) utils.APIResponse
-	UpdateDocumentVersion(payload *models.DocumentVersion) utils.APIResponse
-	DeleteDocumentVersion(id uint) utils.APIResponse
+	GetDocumentVersion(ctx context.Context, id uint) utils.APIResponse
+	GetDocumentVersions(ctx context.Context) pagination.Pagination[[]models.DocumentVersion]
+	CreateDocumentVersion(ctx context.Context, payload *models.DocumentVersion) utils.APIResponse
+	UpdateDocumentVersion(ctx context.Context, payload *models.DocumentVersion) utils.APIResponse
+	DeleteDocumentVersion(ctx context.Context, id uint) utils.APIResponse
 }

@@ -1,26 +1,25 @@
 package ports
 
 import (
+	"context"
+
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
-	"github.com/billowdev/document-system-field-manager/pkg/helpers/filters"
 	"github.com/billowdev/document-system-field-manager/pkg/helpers/pagination"
 	"github.com/billowdev/document-system-field-manager/pkg/utils"
-	"gorm.io/gorm"
 )
 
 type IDocumentRepository interface {
-	BeginTransaction() *gorm.DB
-	GetDocument(id uint) (*models.Document, error)
-	GetDocuments(p pagination.PaginationParams[filters.DocumentFilter]) (*pagination.Pagination[[]models.Document], error)
-	CreateDocument(payload *models.Document) error
-	UpdateDocument(payload *models.Document) error
-	DeleteDocument(id uint) error
+	GetDocument(ctx context.Context, id uint) (*models.Document, error)
+	GetDocuments(ctx context.Context) (*pagination.Pagination[[]models.Document], error)
+	CreateDocument(ctx context.Context, payload *models.Document) error
+	UpdateDocument(ctx context.Context, payload *models.Document) error
+	DeleteDocument(ctx context.Context, id uint) error
 }
 
 type IDocumentService interface {
-	GetDocument(id uint) utils.APIResponse
-	GetDocuments(p pagination.PaginationParams[filters.DocumentFilter]) pagination.Pagination[[]models.Document]
-	CreateDocument(payload *models.Document) utils.APIResponse
-	UpdateDocument(payload *models.Document) utils.APIResponse
-	DeleteDocument(id uint) utils.APIResponse
+	GetDocument(ctx context.Context, id uint) utils.APIResponse
+	GetDocuments(ctx context.Context) pagination.Pagination[[]models.Document]
+	CreateDocument(ctx context.Context, payload *models.Document) utils.APIResponse
+	UpdateDocument(ctx context.Context, payload *models.Document) utils.APIResponse
+	DeleteDocument(ctx context.Context, id uint) utils.APIResponse
 }
