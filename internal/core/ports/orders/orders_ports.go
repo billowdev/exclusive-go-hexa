@@ -9,7 +9,7 @@ import (
 
 type IOrderRepository interface {
 	GetOrder(id uint) (*models.Order, error)
-	GetOrders(param pagination.PaginationParams[filters.OrderFilter]) (*pagination.Pagination[[]models.Order], error)
+	GetOrders(p pagination.PaginationParams[filters.OrderFilter]) (*pagination.Pagination[[]models.Order], error)
 	CreateOrder(payload *models.Order) error
 	UpdateOrder(payload *models.Order) error
 	DeleteOrder(id uint) error
@@ -17,7 +17,7 @@ type IOrderRepository interface {
 
 type IOrderService interface {
 	GetOrder(id uint) utils.APIResponse
-	GetOrders(param pagination.PaginationParams[filters.OrderFilter]) pagination.Pagination[[]models.Order]
+	GetOrders(p pagination.PaginationParams[filters.OrderFilter]) pagination.Pagination[[]models.Order]
 	CreateOrder(payload *models.Order) utils.APIResponse
 	UpdateOrder(payload *models.Order) utils.APIResponse
 	DeleteOrder(id uint) utils.APIResponse

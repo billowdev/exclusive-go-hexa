@@ -9,7 +9,7 @@ import (
 
 type IMasterFileRepository interface {
 	GetMasterFile(id uint) (*models.MasterFile, error)
-	GetMasterFiles(param pagination.PaginationParams[filters.MasterFileFilter]) (*pagination.Pagination[[]models.MasterFile], error)
+	GetMasterFiles(p pagination.PaginationParams[filters.MasterFileFilter]) (*pagination.Pagination[[]models.MasterFile], error)
 	CreateMasterFile(payload *models.MasterFile) error
 	UpdateMasterFile(payload *models.MasterFile) error
 	DeleteMasterFile(id uint) error
@@ -17,7 +17,7 @@ type IMasterFileRepository interface {
 
 type IMasterFileService interface {
 	GetMasterFile(id uint) utils.APIResponse
-	GetMasterFiles(param pagination.PaginationParams[filters.MasterFileFilter]) pagination.Pagination[[]models.MasterFile]
+	GetMasterFiles(p pagination.PaginationParams[filters.MasterFileFilter]) pagination.Pagination[[]models.MasterFile]
 	CreateMasterFile(payload *models.MasterFile) utils.APIResponse
 	UpdateMasterFile(payload *models.MasterFile) utils.APIResponse
 	DeleteMasterFile(id uint) utils.APIResponse

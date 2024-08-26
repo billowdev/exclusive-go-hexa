@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/billowdev/document-system-field-manager/internal/adapters/database/models"
@@ -10,6 +11,76 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
+
+// https://www.kaznacheev.me/posts/en/clean-transactions-in-hexagon/
+type txKey struct{}
+
+// injectTx injects the transaction into the context
+func  InjectTx(ctx context.Context, tx *gorm.DB) context.Context {
+	return context.WithValue(ctx, txKey{}, tx)
+}
+
+// extractTx extracts the transaction from the context
+func  ExtractTx(ctx context.Context) *gorm.DB {
+	if tx, ok := ctx.Value(txKey{}).(*gorm.DB); ok {
+		return tx
+	}
+	return nil
+}
+
+type TransactorImpls struct {
+	db *gorm.DB
+}
+
+// BeginTransaction implements IDatabasePorts.
+func (d *TransactorImpls) BeginTransaction() (*gorm.DB, error) {
+	tx := d.db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return tx, nil
+}
+
+// WithinTransaction implements ITransactor.
+func (d *TransactorImpls) WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error {
+	// begin transaction
+	tx, err := d.BeginTransaction()
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", tx.Error)
+	}
+
+	// Ensure that the transaction is finalized properly
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r) // Re-panic after rollback
+		} else if tx.Error != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
+	// Run the callback function with the transaction context
+	err = tFunc(InjectTx(ctx, tx))
+	if err != nil {
+		tx.Error = err // Set the error to indicate a rollback is needed
+		return err
+	}
+
+	return nil
+}
+
+type ITransactor interface {
+	// InjectTx(ctx context.Context, tx *gorm.DB) context.Context
+	// ExtractTx(ctx context.Context) *gorm.DB
+	WithinTransaction(context.Context, func(ctx context.Context) error) error
+	BeginTransaction() (*gorm.DB, error)
+}
+
+func NewTransactorRepo(db *gorm.DB) ITransactor {
+	return &TransactorImpls{db: db}
+}
 
 func NewDatabase() (*gorm.DB, error) {
 	if configs.DB_SCHEMA == "" {
