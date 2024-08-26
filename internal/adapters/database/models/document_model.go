@@ -30,10 +30,10 @@ type DocumentTemplate struct {
 	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 
-	DocumentName    string  `json:"document_name"`
-	TemplateVersion float64 `json:"template_version"`
-	IsDefault       bool    `json:"is_default"`
-	IsEnable        bool    `json:"is_enable"`
+	DocumentName    string `json:"document_name"`
+	TemplateVersion string `json:"template_version"`
+	IsDefault       bool   `json:"is_default"`
+	IsEnable        bool   `json:"is_enable"`
 }
 
 var TNDocumentTemplate = "document_template"
@@ -51,7 +51,7 @@ type DocumentVersion struct {
 	DocumentID uint           `json:"document_id"`
 	Document   Document       `gorm:"foreignkey:DocumentID"`
 
-	DocumentTemplateID string           `json:"document_template_id"`
+	DocumentTemplateID uint             `json:"document_template_id"`
 	DocumentTemplate   DocumentTemplate `gorm:"foreignkey:DocumentTemplateID"`
 
 	VersionNumber int `json:"version_number"`
@@ -75,6 +75,12 @@ type DocumentTemplateField struct {
 	SystemField        SystemField      `gorm:"foreignkey:SystemFieldID"`
 }
 
+var TNDocumentTemplateField = "document_template_fields"
+
+func (st *DocumentTemplateField) TableName() string {
+	return TNDocumentTemplateField
+}
+
 type DocumentVersionFieldValue struct {
 	gorm.Model
 	ID        uint           `gorm:"primaryKey;autoIncrement" json:"id"`
@@ -87,6 +93,7 @@ type DocumentVersionFieldValue struct {
 
 	DocumentTemplateFieldID uint                  `json:"document_template_field_id"`
 	DocumentTemplateField   DocumentTemplateField `gorm:"foreignkey:DocumentTemplateFieldID"`
+	Value                   string                `json:"value"`
 }
 
 var TNDocumentVersionFieldValue = "document_version_field_value"
@@ -104,11 +111,12 @@ type LogDocumentVersionFieldValue struct {
 
 	DocumentVersionFieldValueID uint                      `json:"document_version_field_value_id"`
 	DocumentVersionFieldValue   DocumentVersionFieldValue `gorm:"foreignkey:DocumentVersionFieldValueID"`
-	MasterFileID                uint                      `json:"master_file_id"`
-	MasterFile                  MasterFile                `gorm:"foreignkey:MasterFileID"`
 
-	PreviousValue string `json:"previous_value"`
-	ModifiedValue string `json:"modified_value"`
+	MasterFileID *uint       `json:"master_file_id"`
+	MasterFile   *MasterFile `gorm:"foreignkey:MasterFileID"`
+
+	PreviousValue *string `json:"previous_value"`
+	ModifiedValue string  `json:"modified_value"`
 }
 
 var TNLogDocumentVersionFieldValue = "log_document_version_field_value"

@@ -15,7 +15,7 @@ type FiberHttpServiceParams struct {
 	Address string
 }
 
-func ProvideFiberHttpServiceParams() *FiberHttpServiceParams {
+func NewFiberHttpServiceParams() *FiberHttpServiceParams {
 
 	fmt.Println("Port = ", SERVER_HTTP_PORT)
 

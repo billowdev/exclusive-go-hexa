@@ -22,3 +22,9 @@ type Activity struct {
 	StartTime  time.Time      `json:"start_time"`
 	EndTime    time.Time      `json:"end_time"`
 }
+
+var TNActivity = "activities"
+
+func (st *Activity) TableName() string {
+	return TNActivity
+}
