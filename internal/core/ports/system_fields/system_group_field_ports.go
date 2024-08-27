@@ -10,11 +10,11 @@ import (
 )
 
 type ISystemGroupFieldRepository interface {
-	GetSystemGroupFields(ctx context.Context, id uint) (*models.SystemGroupField, error)
-	GetSystemGroupFieldss(ctx context.Context, p pagination.PaginationParams[filters.SystemGroupFieldFilter]) (*pagination.Pagination[[]models.SystemGroupField], error)
-	CreateSystemGroupFields(ctx context.Context, payload *models.SystemGroupField) error
-	UpdateSystemGroupFields(ctx context.Context, payload *models.SystemGroupField) error
-	DeleteSystemGroupFields(ctx context.Context, id uint) error
+	GetSystemGroupField(ctx context.Context, id uint) (*models.SystemGroupField, error)
+	GetSystemGroupFields(ctx context.Context, p pagination.PaginationParams[filters.SystemGroupFieldFilter]) (*pagination.Pagination[[]models.SystemGroupField], error)
+	CreateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) error
+	UpdateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) error
+	DeleteSystemGroupField(ctx context.Context, id uint) error
 }
 
 type ISystemGroupFieldService interface {
