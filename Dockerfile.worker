@@ -1,0 +1,22 @@
+# Dockerfile for Temporal Worker
+
+FROM golang:1.22.1-alpine3.18 AS builder
+RUN apk --no-cache add gcc g++ make git
+RUN apk --no-cache add tzdata
+
+WORKDIR /go/src/app
+
+COPY . .
+
+RUN GOOS=linux go build -ldflags="-s -w" -o ./bin/worker ./cmd/worker/main.go
+
+FROM alpine:3.13
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /usr/bin
+COPY --from=builder /go/src/app/bin /go/bin
+COPY .env /usr/bin
+
+ENV TZ=Asia/Bangkok 
+
+ENTRYPOINT /go/bin/worker

@@ -15,3 +15,4 @@ DB_SSL_MODE="disable"
 DB_RUN_MIGRATION=true
 DB_RUN_SEEDER=false
 DB_SCHEMA="public"
+

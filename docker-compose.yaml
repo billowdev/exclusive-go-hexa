@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  hexa-service:
+    image: billowdev/hexa-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - TZ=Asia/Bangkok
+    depends_on:
+      - temporal-worker
+
+  temporal-worker:
+    image: billowdev/temporal-worker:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - TZ=Asia/Bangkok
