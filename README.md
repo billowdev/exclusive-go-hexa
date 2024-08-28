@@ -23,7 +23,7 @@ The core of the application is divided into several packages:
 	- `ports`: Interfaces that define the interactions between the core domain and the external systems.
     	- documents, master_files, orders, system_fields: Ports for different domains.
 
-    - services: Business logic and use cases, organized by domain (e.g., documents, orders, system_fields).
+  - `services`: Business logic and use cases, organized by domain (e.g., documents, orders, system_fields).
 
 
 `pkg`
@@ -36,8 +36,15 @@ Contains shared utilities and helpers that can be used across the application.
 - `utils`: Additional utility functions, such as Argon2ID for password hashing
 
 
+## GraphQL
+- https://gqlgen.com/getting-started/
 
-
+```bash
+go run github.com/99designs/gqlgen init
+```
+```bash
+go run github.com/99designs/gqlgen generate
+```
 
 
 ## Hexagonal Architecture

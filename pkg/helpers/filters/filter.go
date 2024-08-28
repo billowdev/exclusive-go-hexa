@@ -8,7 +8,8 @@ type SystemFieldFilter struct {
 	ID string `json:"id"`
 }
 type SystemGroupFieldFilter struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 type ConfigSystemMasterFileFieldFilter struct {
 	ID string `json:"id"`

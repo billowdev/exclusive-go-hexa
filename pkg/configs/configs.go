@@ -7,10 +7,11 @@ import (
 )
 
 var (
-	APP_API_VERSION string
-	APP_NAME        string
-	APP_ENV         string
-	APP_DEBUG_MODE  bool
+	TEMPORAL_CLIENT_URL string
+	APP_API_VERSION     string
+	APP_NAME            string
+	APP_ENV             string
+	APP_DEBUG_MODE      bool
 
 	VERSION string
 
@@ -30,7 +31,10 @@ var (
 
 func init() {
 	NewViperConfig()
+
 	var err error
+	TEMPORAL_CLIENT_URL = viper.GetString("TEMPORAL_CLIENT_URL")
+
 	APP_DEBUG_MODE, err = strconv.ParseBool(viper.GetString("APP_DEBUG_MODE"))
 	if err != nil {
 		APP_DEBUG_MODE = false
