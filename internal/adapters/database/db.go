@@ -41,7 +41,23 @@ func (d *TransactorImpls) BeginTransaction() (*gorm.DB, error) {
 	return tx, nil
 }
 
-// WithinTransaction implements ITransactor.
+// RollbackTransaction rolls back the transaction if it was started and returns any error encountered.
+func (d *TransactorImpls) RollbackTransaction(tx *gorm.DB) error {
+	if tx == nil {
+		return nil // No transaction to rollback
+	}
+	if tx.Error != nil {
+		return tx.Error // If there was an error, return it
+	}
+
+	// Rollback the transaction
+	if err := tx.Rollback().Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// WithinTransaction implements IDatabaseTransactor.
 func (d *TransactorImpls) WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error {
 	// begin transaction
 	tx, err := d.BeginTransaction()
@@ -52,10 +68,10 @@ func (d *TransactorImpls) WithinTransaction(ctx context.Context, tFunc func(ctx 
 	// Ensure that the transaction is finalized properly
 	defer func() {
 		if r := recover(); r != nil {
-			tx.Rollback()
+			_ = d.RollbackTransaction(tx)
 			panic(r) // Re-panic after rollback
 		} else if tx.Error != nil {
-			tx.Rollback()
+			_ = d.RollbackTransaction(tx)
 		} else {
 			tx.Commit()
 		}
@@ -71,14 +87,15 @@ func (d *TransactorImpls) WithinTransaction(ctx context.Context, tFunc func(ctx 
 	return nil
 }
 
-type ITransactor interface {
+type IDatabaseTransactor interface {
 	// InjectTx(ctx context.Context, tx *gorm.DB) context.Context
 	// ExtractTx(ctx context.Context) *gorm.DB
 	WithinTransaction(context.Context, func(ctx context.Context) error) error
 	BeginTransaction() (*gorm.DB, error)
+	RollbackTransaction(tx *gorm.DB) error
 }
 
-func NewTransactorRepo(db *gorm.DB) ITransactor {
+func NewTransactorRepo(db *gorm.DB) IDatabaseTransactor {
 	return &TransactorImpls{db: db}
 }
 

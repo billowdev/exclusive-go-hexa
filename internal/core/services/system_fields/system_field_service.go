@@ -14,12 +14,12 @@ import (
 
 type SystemFieldServiceImpls struct {
 	repo       ports.ISystemFieldRepository
-	transactor database.ITransactor
+	transactor database.IDatabaseTransactor
 }
 
 func NewSystemFieldService(
 	repo ports.ISystemFieldRepository,
-	transactor database.ITransactor,
+	transactor database.IDatabaseTransactor,
 ) ports.ISystemFieldService {
 	return &SystemFieldServiceImpls{
 		repo:       repo,
@@ -44,8 +44,13 @@ func (s *SystemFieldServiceImpls) CreateSystemField(ctx context.Context, payload
 // DeleteSystemField implements ports.ISystemFieldService.
 func (s *SystemFieldServiceImpls) DeleteSystemField(ctx context.Context, id uint) utils.APIResponse {
 	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
-		panic("test")
+		err := s.repo.DeleteSystemField(txCtx, id)
+		if err != nil {
+			return err
+		}
+		return nil // Transaction is successful if no error occurred during deletion
 	})
+
 	if err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
