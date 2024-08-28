@@ -36,16 +36,6 @@ Contains shared utilities and helpers that can be used across the application.
 - `utils`: Additional utility functions, such as Argon2ID for password hashing
 
 
-## GraphQL
-- https://gqlgen.com/getting-started/
-
-```bash
-go run github.com/99designs/gqlgen init
-```
-```bash
-go run github.com/99designs/gqlgen generate
-```
-
 
 ## Hexagonal Architecture
 ### Core Concepts
@@ -75,3 +65,132 @@ Adapters: The internal/adapters package contains implementations that interact w
 Wom, F. (n.d.). go-hexagonal. GitHub. Retrieved [date you accessed the repository], from https://github.com/felipewom/go-hexagonal
 - Bagash Izuddin (bagashiz). (2021, September 29). Building RESTful API with Hexagonal Architecture in Go. DEV Community. https://dev.to/bagashiz/building-restful-api-with-hexagonal-architecture-in-go-1mij
 - Part 1. Medium. https://medium.com/@pthtantai97/hexagonal-architecture-with-golang-part-1-7f82a364b29
+
+
+## GraphQL
+- https://gqlgen.com/getting-started/
+
+#### 1. Init by use gqlgen
+
+```bash
+go run github.com/99designs/gqlgen init
+```
+
+#### 2. move `graph` to /internal/adapters/gql
+#### 3. rm `server.go`
+#### 4. modify `gqlgen.yml`
+- 4.1 schema โครงสร้าง ของ graphQL ว่าเรามี object model
+```yaml
+schema:
+- graph/*.graphqls
+```
+to
+```yaml
+schema:
+- internal/adapters/gql/schema/*.graphqls
+```
+
+NOTE: mkdir `schema` inside `internal/adapters/gql/` and move `schema.graphqls` to `internal/adapters/gql/schema/schema.graphqls`
+
+- 4.2 exec
+```yaml
+exec:
+  filename: graph/generated.go
+  package: graph
+```
+to
+```yaml
+exec:
+  filename: internal/adapters/gql/generated.go
+  package: graph
+```
+
+- 4.3 model
+```yaml
+model:
+  filename: graph/model/models_gen.go
+  package: model
+```
+to
+```yaml
+model:
+  filename: internal/adapters/gql/model/models_gen.go
+  package: model
+```
+
+- 4.4 resolver ส่วนจัดการ view ของ graphQL
+```yaml
+resolver:
+  layout: follow-schema
+  dir: internal/adapters/gql/resolvers
+  package: graph
+  filename_template: "{name}.resolvers.go"
+```
+to
+```yaml
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+  filename_template: "{name}.resolvers.go"
+```
+NOTE: delete `resolver.go` & `schema.resolvers.go` 
+
+
+#### Example change of `gqlgen.yml`
+- from
+```yaml
+# Where are all the schema files located? globs are supported eg  src/**/*.graphqls
+schema:
+  - graph/*.graphqls
+
+# Where should the generated server code go?
+exec:
+  filename: graph/generated.go
+  package: graph
+
+
+# Where should any generated models go?
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+# Where should the resolver implementations go?
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+  filename_template: "{name}.resolvers.go"
+  # Optional: turn on to not generate template comments above resolvers
+  # omit_template_comment: false
+```
+- to
+```yaml
+# Where are all the schema files located? globs are supported eg  src/**/*.graphqls
+schema:
+- internal/adapters/gql/schema/*.graphqls
+
+# Where should the generated server code go?
+exec:
+  filename: internal/adapters/gql/generated.go
+  package: graph
+
+
+# Where should any generated models go?
+model:
+  filename: internal/adapters/gql/model/models_gen.go
+  package: model
+
+# Where should the resolver implementations go?
+resolver:
+  layout: follow-schema
+  dir: internal/adapters/gql/resolvers
+  package: graph
+  filename_template: "{name}.resolvers.go"
+  # Optional: turn on to not generate template comments above resolvers
+  # omit_template_comment: false
+```
+
+```bash
+go run github.com/99designs/gqlgen generate
+```

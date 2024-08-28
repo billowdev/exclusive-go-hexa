@@ -1,0 +1,52 @@
+# Define the SystemField type
+type SystemField {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String
+  fieldCode: String!
+  fieldName: String!
+  dataType: String!
+  description: String
+  defaultValue: String
+}
+
+# Define the query type
+type Query {
+  # Fetch a single SystemField by ID
+  systemField(id: ID!): SystemField
+  
+  # Fetch a list of SystemFields
+  systemFields: [SystemField!]!
+}
+
+# Define the mutation type
+type Mutation {
+  # Create a new SystemField
+  createSystemField(
+    fieldCode: String!
+    fieldName: String!
+    dataType: String!
+    description: String
+    defaultValue: String
+  ): SystemField!
+  
+  # Update an existing SystemField by ID
+  updateSystemField(
+    id: ID!
+    fieldCode: String
+    fieldName: String
+    dataType: String
+    description: String
+    defaultValue: String
+  ): SystemField!
+  
+  # Delete a SystemField by ID
+  deleteSystemField(id: ID!): Boolean!
+}
+
+# Define the schema
+schema {
+  query: Query
+  mutation: Mutation
+}

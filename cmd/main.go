@@ -5,14 +5,21 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-
+	"net/http"
+	
+	graphqlAdapter "gqlhanon/internal/adapters/gql"
+	graphqlHandler "github.com/99designs/gqlgen/graphql/handler"
+	
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/app"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
+	repositories "github.com/billowdev/exclusive-go-hexa/internal/adapters/repositories/system_fields"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/temporal/dto"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/temporal/workflows"
+	services "github.com/billowdev/exclusive-go-hexa/internal/core/services/system_fields"
 	"github.com/billowdev/exclusive-go-hexa/pkg/configs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 	"go.temporal.io/sdk/client"
 	temporalLog "go.temporal.io/sdk/log"
 )
@@ -82,9 +89,34 @@ func main() {
 		return c.SendString("Ticket purchase initiated successfully")
 	})
 
+	systemFieldRepo := repositories.NewSystemFieldRepo(db)
+	trans := database.NewTransactorRepo(db)
+	systemFieldService := services.NewSystemFieldService(systemFieldRepo, trans)
+
+	resolver := &graphqlAdapter.Resolver{
+		SystemFieldService: systemFieldService,
+		TransactorRepo:     trans,
+	}
+	
+	queryHandler := graphqlHandler.NewDefaultServer(
+		graphqlAdapter.NewExecutableSchema(
+			graphqlAdapter.Config{
+				Resolvers: resolver,
+			},
+		),
+	)
+	fiberHTTP.Post("/query", func(c *fiber.Ctx) error {
+		fasthttpadaptor.NewFastHTTPHandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			queryHandler.ServeHTTP(writer, request)
+		})(c.Context())
+
+		return nil
+	})
+
 	err = fiberHTTP.Listen(portString)
 
 	if err != nil {
 		log.Fatal("Failed to start golang Fiber server:", err)
 	}
+
 }
