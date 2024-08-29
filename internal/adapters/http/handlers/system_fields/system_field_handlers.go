@@ -21,7 +21,7 @@ type (
 		HandleCreateSystemField(c *fiber.Ctx) error
 		HandleDeleteSystemField(c *fiber.Ctx) error
 	}
-	SystemFieldImpls struct {
+	SystemFieldImpl struct {
 		systemFieldService ports.ISystemFieldService
 	}
 )
@@ -29,11 +29,11 @@ type (
 func NewSystemFieldHandler(
 	systemFieldService ports.ISystemFieldService,
 ) ISystemFieldHandler {
-	return &SystemFieldImpls{systemFieldService: systemFieldService}
+	return &SystemFieldImpl{systemFieldService: systemFieldService}
 }
 
 // HandleCreateSystemField implements ISystemFieldHandler.
-func (s *SystemFieldImpls) HandleCreateSystemField(c *fiber.Ctx) error {
+func (s *SystemFieldImpl) HandleCreateSystemField(c *fiber.Ctx) error {
 	var payload models.SystemField
 	if err := c.BodyParser(&payload); err != nil {
 		return utils.NewErrorResponse(c, "Invalid request payload", err.Error())
@@ -48,7 +48,7 @@ func (s *SystemFieldImpls) HandleCreateSystemField(c *fiber.Ctx) error {
 }
 
 // HandleDeleteSystemField implements ISystemFieldHandler.
-func (s *SystemFieldImpls) HandleDeleteSystemField(c *fiber.Ctx) error {
+func (s *SystemFieldImpl) HandleDeleteSystemField(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.NewErrorResponse(c, "Invalid ID", err.Error())
@@ -63,7 +63,7 @@ func (s *SystemFieldImpls) HandleDeleteSystemField(c *fiber.Ctx) error {
 }
 
 // HandleUpdateSystemField implements ISystemFieldHandler.
-func (s *SystemFieldImpls) HandleUpdateSystemField(c *fiber.Ctx) error {
+func (s *SystemFieldImpl) HandleUpdateSystemField(c *fiber.Ctx) error {
 	var payload models.SystemField
 	if err := c.BodyParser(&payload); err != nil {
 		return utils.NewErrorResponse(c, "Invalid request payload", err.Error())
@@ -78,7 +78,7 @@ func (s *SystemFieldImpls) HandleUpdateSystemField(c *fiber.Ctx) error {
 }
 
 // HandleGetSystemField implements ISystemFieldHandler.
-func (s *SystemFieldImpls) HandleGetSystemField(c *fiber.Ctx) error {
+func (s *SystemFieldImpl) HandleGetSystemField(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.NewErrorResponse(c, "Invalid ID", err.Error())
@@ -93,7 +93,7 @@ func (s *SystemFieldImpls) HandleGetSystemField(c *fiber.Ctx) error {
 }
 
 // HandleGetSystemFields implements ISystemFieldHandler.
-func (s *SystemFieldImpls) HandleGetSystemFields(c *fiber.Ctx) error {
+func (s *SystemFieldImpl) HandleGetSystemFields(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := ctx.Err(); err != nil {

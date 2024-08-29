@@ -12,7 +12,7 @@ import (
 	"github.com/billowdev/exclusive-go-hexa/pkg/utils"
 )
 
-type SystemFieldServiceImpls struct {
+type SystemFieldServiceImpl struct {
 	repo       ports.ISystemFieldRepository
 	transactor database.IDatabaseTransactor
 }
@@ -21,14 +21,14 @@ func NewSystemFieldService(
 	repo ports.ISystemFieldRepository,
 	transactor database.IDatabaseTransactor,
 ) ports.ISystemFieldService {
-	return &SystemFieldServiceImpls{
+	return &SystemFieldServiceImpl{
 		repo:       repo,
 		transactor: transactor,
 	}
 }
 
 // CreateSystemField implements ports.ISystemFieldService.
-func (s *SystemFieldServiceImpls) CreateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
+func (s *SystemFieldServiceImpl) CreateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
 	// tx, err := s.transactor.BeginTransaction()
 	// if err != nil {
 	// 	return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
@@ -42,7 +42,7 @@ func (s *SystemFieldServiceImpls) CreateSystemField(ctx context.Context, payload
 }
 
 // DeleteSystemField implements ports.ISystemFieldService.
-func (s *SystemFieldServiceImpls) DeleteSystemField(ctx context.Context, id uint) utils.APIResponse {
+func (s *SystemFieldServiceImpl) DeleteSystemField(ctx context.Context, id uint) utils.APIResponse {
 	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
 		err := s.repo.DeleteSystemField(txCtx, id)
 		if err != nil {
@@ -59,7 +59,7 @@ func (s *SystemFieldServiceImpls) DeleteSystemField(ctx context.Context, id uint
 }
 
 // GetSystemField implements ports.ISystemFieldService.
-func (s *SystemFieldServiceImpls) GetSystemField(ctx context.Context, id uint) utils.APIResponse {
+func (s *SystemFieldServiceImpl) GetSystemField(ctx context.Context, id uint) utils.APIResponse {
 	data, err := s.repo.GetSystemField(ctx, id)
 	if err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
@@ -72,7 +72,7 @@ func (s *SystemFieldServiceImpls) GetSystemField(ctx context.Context, id uint) u
 }
 
 // GetSystemFields implements ports.ISystemFieldService.
-func (s *SystemFieldServiceImpls) GetSystemFields(ctx context.Context) pagination.Pagination[[]domain.SystemFieldDomain] {
+func (s *SystemFieldServiceImpl) GetSystemFields(ctx context.Context) pagination.Pagination[[]domain.SystemFieldDomain] {
 	data, err := s.repo.GetSystemFields(ctx)
 	if err != nil {
 		return pagination.Pagination[[]domain.SystemFieldDomain]{}
@@ -91,7 +91,7 @@ func (s *SystemFieldServiceImpls) GetSystemFields(ctx context.Context) paginatio
 }
 
 // UpdateSystemField implements ports.ISystemFieldService.
-func (s *SystemFieldServiceImpls) UpdateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
+func (s *SystemFieldServiceImpl) UpdateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
 	// tx, err := s.transactor.BeginTransaction()
 	// if err!= nil {
 	//     return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}

@@ -13,7 +13,7 @@ import (
 	"github.com/billowdev/exclusive-go-hexa/pkg/utils"
 )
 
-type SystemFieldGroupServiceImpls struct {
+type SystemFieldGroupServiceImpl struct {
 	repo       ports.ISystemGroupFieldRepository
 	transactor database.IDatabaseTransactor
 }
@@ -22,11 +22,11 @@ func NewSystemGroupFieldService(
 	repo ports.ISystemGroupFieldRepository,
 	transactor database.IDatabaseTransactor,
 ) ports.ISystemGroupFieldService {
-	return &SystemFieldGroupServiceImpls{repo: repo, transactor: transactor}
+	return &SystemFieldGroupServiceImpl{repo: repo, transactor: transactor}
 }
 
 // CreateSystemGroupField implements ports.ISystemGroupFieldService.
-func (s *SystemFieldGroupServiceImpls) CreateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse {
+func (s *SystemFieldGroupServiceImpl) CreateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse {
 	if err := s.repo.CreateSystemGroupField(ctx, payload); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
@@ -34,7 +34,7 @@ func (s *SystemFieldGroupServiceImpls) CreateSystemGroupField(ctx context.Contex
 }
 
 // DeleteSystemGroupField implements ports.ISystemGroupFieldService.
-func (s *SystemFieldGroupServiceImpls) DeleteSystemGroupField(ctx context.Context, id uint) utils.APIResponse {
+func (s *SystemFieldGroupServiceImpl) DeleteSystemGroupField(ctx context.Context, id uint) utils.APIResponse {
 	if err := s.repo.DeleteSystemGroupField(ctx, id); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
@@ -42,7 +42,7 @@ func (s *SystemFieldGroupServiceImpls) DeleteSystemGroupField(ctx context.Contex
 }
 
 // GetSystemGroupField implements ports.ISystemGroupFieldService.
-func (s *SystemFieldGroupServiceImpls) GetSystemGroupField(ctx context.Context, id uint) utils.APIResponse {
+func (s *SystemFieldGroupServiceImpl) GetSystemGroupField(ctx context.Context, id uint) utils.APIResponse {
 
 	data, err := s.repo.GetSystemGroupField(ctx, id)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *SystemFieldGroupServiceImpls) GetSystemGroupField(ctx context.Context, 
 }
 
 // GetSystemGroupFields implements ports.ISystemGroupFieldService.
-func (s *SystemFieldGroupServiceImpls) GetSystemGroupFields(ctx context.Context) pagination.Pagination[[]domain.SystemGroupFieldDomain] {
+func (s *SystemFieldGroupServiceImpl) GetSystemGroupFields(ctx context.Context) pagination.Pagination[[]domain.SystemGroupFieldDomain] {
 	data, err := s.repo.GetSystemGroupFields(ctx)
 	if err != nil {
 		return pagination.Pagination[[]domain.SystemGroupFieldDomain]{}
@@ -74,7 +74,7 @@ func (s *SystemFieldGroupServiceImpls) GetSystemGroupFields(ctx context.Context)
 }
 
 // UpdateSystemGroupField implements ports.ISystemGroupFieldService.
-func (s *SystemFieldGroupServiceImpls) UpdateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse {
+func (s *SystemFieldGroupServiceImpl) UpdateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse {
 	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
 		err := s.repo.UpdateSystemGroupField(ctx, payload)
 		if err != nil {

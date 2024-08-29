@@ -17,7 +17,7 @@ func AppContainer(app *fiber.App, db *gorm.DB) *fiber.App {
 	return app
 }
 
-func SystemFieldApp(r routers.RouterImpls, db *gorm.DB) {
+func SystemFieldApp(r routers.RouterImpl, db *gorm.DB) {
 	transactorRepo := database.NewTransactorRepo(db)
 	sfRepo := repositories.NewSystemFieldRepo(db)
 	sfSrv := services.NewSystemFieldService(sfRepo, transactorRepo)

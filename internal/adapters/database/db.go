@@ -1,7 +1,6 @@
 package database
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
@@ -11,93 +10,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
-
-// Idea https://www.kaznacheev.me/posts/en/clean-transactions-in-hexagon/
-type txKey struct{}
-
-// injectTx injects the transaction into the context
-func InjectTx(ctx context.Context, tx *gorm.DB) context.Context {
-	return context.WithValue(ctx, txKey{}, tx)
-}
-
-// extractTx extracts the transaction from the context
-func ExtractTx(ctx context.Context) *gorm.DB {
-	if tx, ok := ctx.Value(txKey{}).(*gorm.DB); ok {
-		return tx
-	}
-	return nil
-}
-
-type TransactorImpls struct {
-	db *gorm.DB
-}
-
-// BeginTransaction implements IDatabasePorts.
-func (d *TransactorImpls) BeginTransaction() (*gorm.DB, error) {
-	tx := d.db.Begin()
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
-	return tx, nil
-}
-
-// RollbackTransaction rolls back the transaction if it was started and returns any error encountered.
-func (d *TransactorImpls) RollbackTransaction(tx *gorm.DB) error {
-	if tx == nil {
-		return nil // No transaction to rollback
-	}
-	if tx.Error != nil {
-		return tx.Error // If there was an error, return it
-	}
-
-	// Rollback the transaction
-	if err := tx.Rollback().Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-// WithinTransaction implements IDatabaseTransactor.
-func (d *TransactorImpls) WithinTransaction(ctx context.Context, tFunc func(ctx context.Context) error) error {
-	// begin transaction
-	tx, err := d.BeginTransaction()
-	if err != nil {
-		return fmt.Errorf("begin transaction: %w", tx.Error)
-	}
-
-	// Ensure that the transaction is finalized properly
-	defer func() {
-		if r := recover(); r != nil {
-			_ = d.RollbackTransaction(tx)
-			panic(r) // Re-panic after rollback
-		} else if tx.Error != nil {
-			_ = d.RollbackTransaction(tx)
-		} else {
-			tx.Commit()
-		}
-	}()
-
-	// Run the callback function with the transaction context
-	err = tFunc(InjectTx(ctx, tx))
-	if err != nil {
-		tx.Error = err // Set the error to indicate a rollback is needed
-		return err
-	}
-
-	return nil
-}
-
-type IDatabaseTransactor interface {
-	// InjectTx(ctx context.Context, tx *gorm.DB) context.Context
-	// ExtractTx(ctx context.Context) *gorm.DB
-	WithinTransaction(context.Context, func(ctx context.Context) error) error
-	BeginTransaction() (*gorm.DB, error)
-	RollbackTransaction(tx *gorm.DB) error
-}
-
-func NewTransactorRepo(db *gorm.DB) IDatabaseTransactor {
-	return &TransactorImpls{db: db}
-}
 
 func NewDatabase() (*gorm.DB, error) {
 	if configs.DB_SCHEMA == "" {

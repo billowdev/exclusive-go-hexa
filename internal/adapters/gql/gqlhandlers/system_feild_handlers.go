@@ -12,17 +12,17 @@ type (
 	IGQLSystemFieldHandler interface {
 		CreateSystemField(req *model.SystemField) *model.SystemField
 	}
-	GQLSystemFieldHandlerImpls struct {
+	GQLSystemFieldHandlerImpl struct {
 		systemFieldService ports.ISystemFieldService // dependency injection
 	}
 )
 
 func NewGQLSystemFieldHandler(systemFieldService ports.ISystemFieldService) IGQLSystemFieldHandler {
-	return &GQLSystemFieldHandlerImpls{systemFieldService: systemFieldService}
+	return &GQLSystemFieldHandlerImpl{systemFieldService: systemFieldService}
 }
 
 // CreateSystemField implements IGQLSystemFieldHandler.
-func (g *GQLSystemFieldHandlerImpls) CreateSystemField(req *model.SystemField) *model.SystemField {
+func (g *GQLSystemFieldHandlerImpl) CreateSystemField(req *model.SystemField) *model.SystemField {
 	descripton := ""
 	defaultValue := ""
 	if req.Description != nil {

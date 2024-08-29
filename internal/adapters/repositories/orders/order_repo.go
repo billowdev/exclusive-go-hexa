@@ -11,57 +11,47 @@ import (
 	"gorm.io/gorm"
 )
 
-type OrderImpls struct {
+type OrderImpl struct {
 	db *gorm.DB
 }
 
 func NewOrderRepository(db *gorm.DB) ports.IOrderRepository {
-	return &OrderImpls{db: db}
+	return &OrderImpl{db: db}
 }
 
 // CreateOrder implements ports.IOrderRepository.
-func (o *OrderImpls) CreateOrder(ctx context.Context, payload *models.Order) error {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = o.db
-	}
-	if err := tx.Create(&payload).Error; err != nil {
+func (o *OrderImpl) CreateOrder(ctx context.Context, payload *models.Order) error {
+	tx := database.HelperExtractTx(ctx, o.db)
+	if err := tx.WithContext(ctx).Create(&payload).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // DeleteOrder implements ports.IOrderRepository.
-func (o *OrderImpls) DeleteOrder(ctx context.Context, id uint) error {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = o.db
-	}
-	if err := tx.Delete(&models.Order{}, id).Error; err != nil {
+func (o *OrderImpl) DeleteOrder(ctx context.Context, id uint) error {
+	tx := database.HelperExtractTx(ctx, o.db)
+	if err := tx.WithContext(ctx).Delete(&models.Order{}, id).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // GetOrder implements ports.IOrderRepository.
-func (o *OrderImpls) GetOrder(ctx context.Context, id uint) (*models.Order, error) {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = o.db
-	}
+func (o *OrderImpl) GetOrder(ctx context.Context, id uint) (*models.Order, error) {
+	tx := database.HelperExtractTx(ctx, o.db)
+
 	var data models.Order
-	if err := tx.Where("id =?", id).First(&data).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id =?", id).First(&data).Error; err != nil {
 		return nil, err
 	}
 	return &data, nil
 }
 
 // GetOrders implements ports.IOrderRepository.
-func (o *OrderImpls) GetOrders(ctx context.Context) (*pagination.Pagination[[]models.Order], error) {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = o.db
-	}
+func (o *OrderImpl) GetOrders(ctx context.Context) (*pagination.Pagination[[]models.Order], error) {
+	tx := database.HelperExtractTx(ctx, o.db)
+
 	p := pagination.GetFilters[filters.OrderFilter](ctx)
 	fp := p.Filters
 
@@ -71,7 +61,7 @@ func (o *OrderImpls) GetOrders(ctx context.Context) (*pagination.Pagination[[]mo
 		DefaultOrderBy: "updated_at DESC",
 	})
 	tx = pagination.ApplyFilter(tx, "id", fp.ID, "contains")
-	tx = tx.Order(orderBy)
+	tx = tx.WithContext(ctx).Order(orderBy)
 	data, err := pagination.Paginate[filters.OrderFilter, []models.Order](p, tx)
 	if err != nil {
 		return nil, err
@@ -80,6 +70,10 @@ func (o *OrderImpls) GetOrders(ctx context.Context) (*pagination.Pagination[[]mo
 }
 
 // UpdateOrder implements ports.IOrderRepository.
-func (o *OrderImpls) UpdateOrder(ctx context.Context, payload *models.Order) error {
-	panic("unimplemented")
+func (o *OrderImpl) UpdateOrder(ctx context.Context, payload *models.Order) error {
+	tx := database.HelperExtractTx(ctx, o.db)
+	if err := tx.WithContext(ctx).Save(&payload).Error; err != nil {
+		return err
+	}
+	return nil
 }

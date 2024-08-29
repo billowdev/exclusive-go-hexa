@@ -11,33 +11,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type SystemFieldRepositoryImpls struct {
+type SystemFieldRepositoryImpl struct {
 	db *gorm.DB
 }
 
 func NewSystemFieldRepo(db *gorm.DB) ports.ISystemFieldRepository {
-	return &SystemFieldRepositoryImpls{db: db}
+	return &SystemFieldRepositoryImpl{db: db}
 }
 
 // CreateSystemField implements ports.ISystemFieldRepository.
-func (s *SystemFieldRepositoryImpls) CreateSystemField(ctx context.Context, payload *models.SystemField) error {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = s.db
-	}
-	if err := tx.Create(&payload).Error; err != nil {
+func (s *SystemFieldRepositoryImpl) CreateSystemField(ctx context.Context, payload *models.SystemField) error {
+	tx := database.HelperExtractTx(ctx, s.db)
+	if err := tx.WithContext(ctx).Create(&payload).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // DeleteSystemField implements ports.ISystemFieldRepository.
-func (s *SystemFieldRepositoryImpls) DeleteSystemField(ctx context.Context, id uint) error {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = s.db
-	}
-	if err := tx.Delete(&models.SystemField{}, id).Error; err != nil {
+func (s *SystemFieldRepositoryImpl) DeleteSystemField(ctx context.Context, id uint) error {
+	tx := database.HelperExtractTx(ctx, s.db)
+	if err := tx.WithContext(ctx).Delete(&models.SystemField{}, id).Error; err != nil {
 		return err
 	}
 	return nil
@@ -50,13 +44,11 @@ func (s *SystemFieldRepositoryImpls) DeleteSystemField(ctx context.Context, id u
 }
 
 // GetSystemField implements ports.ISystemFieldRepository.
-func (s *SystemFieldRepositoryImpls) GetSystemField(ctx context.Context, id uint) (*models.SystemField, error) {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = s.db
-	}
+func (s *SystemFieldRepositoryImpl) GetSystemField(ctx context.Context, id uint) (*models.SystemField, error) {
+	tx := database.HelperExtractTx(ctx, s.db)
+
 	var systemField models.SystemField
-	if err := tx.Where("id =?", id).First(&systemField).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id =?", id).First(&systemField).Error; err != nil {
 		return nil, err
 	}
 	return &systemField, nil
@@ -72,7 +64,7 @@ func (s *SystemFieldRepositoryImpls) GetSystemField(ctx context.Context, id uint
 }
 
 // GetSystemFields implements ports.ISystemFieldRepository.
-func (s *SystemFieldRepositoryImpls) GetSystemFields(ctx context.Context) (*pagination.Pagination[[]models.SystemField], error) {
+func (s *SystemFieldRepositoryImpl) GetSystemFields(ctx context.Context) (*pagination.Pagination[[]models.SystemField], error) {
 	p := pagination.GetFilters[filters.SystemFieldFilter](ctx)
 	fp := p.Filters
 	q := s.db
@@ -91,12 +83,10 @@ func (s *SystemFieldRepositoryImpls) GetSystemFields(ctx context.Context) (*pagi
 }
 
 // UpdateSystemField implements ports.ISystemFieldRepository.
-func (s *SystemFieldRepositoryImpls) UpdateSystemField(ctx context.Context, payload *models.SystemField) error {
-	tx := database.ExtractTx(ctx)
-	if tx == nil {
-		tx = s.db
-	}
-	if err := tx.Save(&payload).Error; err != nil {
+func (s *SystemFieldRepositoryImpl) UpdateSystemField(ctx context.Context, payload *models.SystemField) error {
+	tx := database.HelperExtractTx(ctx, s.db)
+
+	if err := tx.WithContext(ctx).Save(&payload).Error; err != nil {
 		return err
 	}
 	return nil
