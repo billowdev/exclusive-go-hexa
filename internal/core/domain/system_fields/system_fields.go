@@ -43,7 +43,7 @@ type SystemFieldDomain struct {
 //	}
 //
 // Adjusted ToDomainModel function to accept a pointer
-func ToDomainModel(sf *models.SystemField) SystemFieldDomain {
+func ToSystemFieldDomain(sf *models.SystemField) SystemFieldDomain {
 	if sf == nil {
 		return SystemFieldDomain{}
 	}

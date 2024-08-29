@@ -37,7 +37,7 @@ func (s *SystemFieldServiceImpl) CreateSystemField(ctx context.Context, payload 
 	if err := s.repo.CreateSystemField(ctx, payload); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
-	res := domain.ToDomainModel(payload)
+	res := domain.ToSystemFieldDomain(payload)
 	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: res}
 }
 
@@ -67,7 +67,7 @@ func (s *SystemFieldServiceImpl) GetSystemField(ctx context.Context, id uint) ut
 	if data == nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: nil}
 	}
-	res := domain.ToDomainModel(data)
+	res := domain.ToSystemFieldDomain(data)
 	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: res}
 }
 
@@ -78,7 +78,7 @@ func (s *SystemFieldServiceImpl) GetSystemFields(ctx context.Context) pagination
 		return pagination.Pagination[[]domain.SystemFieldDomain]{}
 	}
 	// Convert repository data to domain models
-	newData := utils.ConvertSlice(data.Rows, domain.ToDomainModel)
+	newData := utils.ConvertSlice(data.Rows, domain.ToSystemFieldDomain)
 
 	return pagination.Pagination[[]domain.SystemFieldDomain]{
 		Rows:       newData,
@@ -100,6 +100,6 @@ func (s *SystemFieldServiceImpl) UpdateSystemField(ctx context.Context, payload 
 	if err := s.repo.UpdateSystemField(ctx, payload); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
-	res := domain.ToDomainModel(payload)
+	res := domain.ToSystemFieldDomain(payload)
 	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: res}
 }
