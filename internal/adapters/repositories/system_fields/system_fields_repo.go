@@ -51,8 +51,12 @@ func (s *SystemFieldRepositoryImpls) DeleteSystemField(ctx context.Context, id u
 
 // GetSystemField implements ports.ISystemFieldRepository.
 func (s *SystemFieldRepositoryImpls) GetSystemField(ctx context.Context, id uint) (*models.SystemField, error) {
+	tx := database.ExtractTx(ctx)
+	if tx == nil {
+		tx = s.db
+	}
 	var systemField models.SystemField
-	if err := s.db.Where("id =?", id).First(&systemField).Error; err != nil {
+	if err := tx.Where("id =?", id).First(&systemField).Error; err != nil {
 		return nil, err
 	}
 	return &systemField, nil
