@@ -24,3 +24,24 @@ test:
 gql-gen:
 	go get github.com/99designs/gqlgen
 	go run github.com/99designs/gqlgen generate
+
+
+grpc-server-gen:
+	mkdir -p internal/adapters/grpc_server/pb
+	protoc \
+		--proto_path=internal/adapters/grpc_server/proto  \
+		--go_out=internal/adapters/grpc_server/pb \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=internal/adapters/grpc_server/pb \
+		--go-grpc_opt=paths=source_relative \
+		internal/adapters/grpc_server/proto/*.proto
+
+grpc-client-gen:
+	mkdir -p internal/adapters/grpc_server/pb
+	protoc \
+		--proto_path=internal/adapters/grpc_server/proto  \
+		--go_out=internal/adapters/grpc_server/pb \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=internal/adapters/grpc_server/pb \
+		--go-grpc_opt=paths=source_relative \
+		internal/adapters/grpc_server/proto/*.proto
