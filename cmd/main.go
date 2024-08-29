@@ -5,21 +5,19 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"net/http"
-	
-	graphqlAdapter "gqlhanon/internal/adapters/gql"
-	graphqlHandler "github.com/99designs/gqlgen/graphql/handler"
-	
+
+	// graphqlAdapter "gqlhanon/internal/adapters/gql"
+	// graphqlHandler "github.com/99designs/gqlgen/graphql/handler"
+	// repositories "github.com/billowdev/exclusive-go-hexa/internal/adapters/repositories/system_fields"
+	// services "github.com/billowdev/exclusive-go-hexa/internal/core/services/system_fields"
+
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/app"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
-	repositories "github.com/billowdev/exclusive-go-hexa/internal/adapters/repositories/system_fields"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/temporal/dto"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/temporal/workflows"
-	services "github.com/billowdev/exclusive-go-hexa/internal/core/services/system_fields"
 	"github.com/billowdev/exclusive-go-hexa/pkg/configs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/valyala/fasthttp/fasthttpadaptor"
 	"go.temporal.io/sdk/client"
 	temporalLog "go.temporal.io/sdk/log"
 )
@@ -78,40 +76,48 @@ func main() {
 		workflowOptions := client.StartWorkflowOptions{
 			ID:        "regis_" + request.IDCard + "_" + uuid.New().String(),
 			TaskQueue: "REGISTER_TASK_QUEUE",
+			
 		}
-		we, err := temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, workflows.RegistrationWorkflow, *request)
+
+		ctx := context.Background()
+
+		if err := database.InjectTx(ctx, db); err != nil {
+			return c.SendString("Register initiated failed")
+		}
+
+		we, err := temporalClient.ExecuteWorkflow(ctx, workflowOptions, workflows.RegistrationWorkflow, *request)
 		if err != nil {
 			log.Println("Unable to start workflow", err)
 			return c.Status(fiber.StatusInternalServerError).SendString("Failed to start workflow")
 		}
 
 		log.Println("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
-		return c.SendString("Ticket purchase initiated successfully")
+		return c.SendString("Register initiated successfully")
 	})
 
-	systemFieldRepo := repositories.NewSystemFieldRepo(db)
-	trans := database.NewTransactorRepo(db)
-	systemFieldService := services.NewSystemFieldService(systemFieldRepo, trans)
+	// systemFieldRepo := repositories.NewSystemFieldRepo(db)
+	// trans := database.NewTransactorRepo(db)
+	// systemFieldService := services.NewSystemFieldService(systemFieldRepo, trans)
 
-	resolver := &graphqlAdapter.Resolver{
-		SystemFieldService: systemFieldService,
-		TransactorRepo:     trans,
-	}
-	
-	queryHandler := graphqlHandler.NewDefaultServer(
-		graphqlAdapter.NewExecutableSchema(
-			graphqlAdapter.Config{
-				Resolvers: resolver,
-			},
-		),
-	)
-	fiberHTTP.Post("/query", func(c *fiber.Ctx) error {
-		fasthttpadaptor.NewFastHTTPHandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-			queryHandler.ServeHTTP(writer, request)
-		})(c.Context())
+	// resolver := &graphqlAdapter.Resolver{
+	// 	SystemFieldService: systemFieldService,
+	// 	TransactorRepo:     trans,
+	// }
 
-		return nil
-	})
+	// queryHandler := graphqlHandler.NewDefaultServer(
+	// 	graphqlAdapter.NewExecutableSchema(
+	// 		graphqlAdapter.Config{
+	// 			Resolvers: resolver,
+	// 		},
+	// 	),
+	// )
+	// fiberHTTP.Post("/query", func(c *fiber.Ctx) error {
+	// 	fasthttpadaptor.NewFastHTTPHandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+	// 		queryHandler.ServeHTTP(writer, request)
+	// 	})(c.Context())
+
+	// 	return nil
+	// })
 
 	err = fiberHTTP.Listen(portString)
 

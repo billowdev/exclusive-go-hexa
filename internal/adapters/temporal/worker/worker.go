@@ -36,9 +36,11 @@ func WorkflowClient() client.Client {
 
 func RegisterTemporalWorkflow(c client.Client, db *gorm.DB) {
 	workerOptions := worker.Options{
+
 		// MaxConcurrentActivityExecutionSize: 1, // Limits the number of concurrent activities
 		// MaxConcurrentWorkflowTaskPollers:   1, // Ensures only one workflow task poller
 	}
+
 	ticketWorker := worker.New(c, "TICKET_TASK_QUEUE", workerOptions)
 	ticketWorker.RegisterWorkflow(workflows.TicketPurchaseWorkflow)
 	ticketWorker.RegisterActivity(activities.ValidateRequestActivity)
@@ -49,6 +51,7 @@ func RegisterTemporalWorkflow(c client.Client, db *gorm.DB) {
 	registerWorker := worker.New(c, "REGISTER_TASK_QUEUE", workerOptions)
 	registerWorker.RegisterWorkflow(workflows.RegistrationWorkflow)
 	registerWorker.RegisterActivity(activities.RegisterDataActivity)
+
 	registerWorker.RegisterActivity(activities.CheckDataActivity)
 	registerWorker.RegisterActivity(activities.VerifyIdentitiesActivity)
 	registerWorker.RegisterActivity(activities.UpdateStatusActivity)

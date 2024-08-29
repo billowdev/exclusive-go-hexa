@@ -11,10 +11,17 @@ import (
 func RegistrationWorkflow(ctx workflow.Context, data dto.RegistrationData) error {
 	ao := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second, // Adjust based on your needs
+		// RetryPolicy: &internal.RetryPolicy{
+
+		// },
 	}
+
 	ctx = workflow.WithActivityOptions(ctx, ao)
 
 	// Step 1: Register Data
+	// var registerResult *pagination.Pagination[[]models.SystemField]
+
+	// err := workflow.ExecuteActivity(ctx, activities.RegisterDataActivity, data).Get(ctx, &registerResult)
 	err := workflow.ExecuteActivity(ctx, activities.RegisterDataActivity, data).Get(ctx, nil)
 	if err != nil {
 		return err
