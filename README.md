@@ -194,3 +194,185 @@ resolver:
 ```bash
 go run github.com/99designs/gqlgen generate
 ```
+
+
+
+### Transactor
+
+- `WithTransactionContextTimeout` Function
+  
+```go
+package database
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"gorm.io/gorm"
+)
+
+// WithTransactionContextTimeout executes a function within a transaction with a specified context timeout.
+// The transaction is committed if successful, or rolled back if an error occurs or the context times out.
+func (d *TransactorImpl) WithTransactionContextTimeout(ctx context.Context, timeout time.Duration, tFunc func(ctx context.Context) error) error {
+	// Create a new context with timeout
+	transactionCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	// Start a new transaction
+	tx, err := d.BeginTransaction()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	// Ensure that the transaction is finalized properly
+	defer func() {
+		select {
+		case <-transactionCtx.Done():
+			// Rollback if the transaction context is done (timeout or cancel)
+			if rollbackErr := d.RollbackTransaction(tx); rollbackErr != nil {
+				log.Printf("failed to rollback transaction: %v", rollbackErr)
+			}
+		default:
+			// Commit if no error and context is still valid
+			if commitErr := tx.Commit().Error; commitErr != nil {
+				log.Printf("failed to commit transaction: %v", commitErr)
+				err = commitErr
+			}
+		}
+	}()
+
+	// Run the callback function with the transaction context
+	err = tFunc(InjectTx(transactionCtx, tx))
+	if err != nil {
+		tx.Error = err // Mark the transaction as needing a rollback
+		return err
+	}
+
+	return nil
+}
+```
+
+- Explanation
+1. Context with Timeout:
+- Creates a new context with a specified timeout using `context.WithTimeout`. This context will be used for the transaction operations.
+2. Start Transaction:
+- Begins a new transaction with `BeginTransaction`.
+3. Deferred Finalization:
+
+- Uses `defer` to ensure the transaction is finalized correctly:
+  - Rollback on Timeout or Cancellation: Rolls back the transaction if the context is canceled or times out.
+  - Commit on Success: Commits the transaction if it completes successfully within the timeout period.
+4. Function Execution:
+  Executes the provided function `tFunc` within the transaction context, passing the transaction as part of the context using `InjectTx`.
+5. Error Handling:
+- Sets the transaction error to indicate a rollback is needed if tFunc returns an error.
+- Logs errors during commit and rollback operations.
+
+
+- Usage Example
+```go
+// CreateSeaPort attempts to create a new sea port entry within a transaction.
+// It uses the WithTransactionContextTimeout function to ensure that the transaction
+// is managed properly with a specified timeout.
+func (s *SeaPortServicesImpl) CreateSeaPort(ctx context.Context, payload domain.SeaPortDomain) utils.APIV2Response {
+    var result utils.APIV2Response
+
+    // Use the WithTransactionContextTimeout function to handle the transaction
+    err := s.transactor.WithTransactionContextTimeout(ctx, 5*time.Second, func(txCtx context.Context) error {
+        // Convert the domain payload to a model suitable for database operations
+        data := domain.ToSeaPortModel(payload)
+        
+        // Create the sea port entry in the database using the transaction context
+        if err := s.repo.CreateSeaPort(txCtx, data); err != nil {
+            return err // Return error to trigger rollback
+        }
+        
+        // If no errors occurred, prepare a successful response
+        result = utils.APIV2Response{
+            StatusCode:    utils.API_SUCCESS_CODE,
+            StatusMessage: "Success",
+            Data:          domain.ToSeaPortDomain(data),
+        }
+        return nil // Indicate success
+    })
+
+    // Check if there was an error during the transaction
+    if err != nil {
+        // Prepare an error response if something went wrong
+        result = utils.APIV2Response{
+            StatusCode:    utils.API_ERROR_CODE,
+            StatusMessage: "Error",
+            Data:          err,
+        }
+    }
+
+    // Return the result of the transaction
+    return result
+}
+```
+
+
+#### Using WithinTransaction:
+
+```
+func (s *SeaPortServicesImpl) CreateSeaPort(ctx context.Context, payload domain.SeaPortDomain) utils.APIV2Response {
+	var result utils.APIV2Response
+
+	// Create a context with a timeout for the transaction
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	// Use the WithinTransaction function to handle the transaction
+	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+		// Convert the domain payload to a model suitable for database operations
+		data := domain.ToSeaPortModel(payload)
+
+		// Create the sea port entry in the database using the transaction context
+		if err := s.repo.CreateSeaPort(txCtx, data); err != nil {
+			return err // Return error to trigger rollback
+		}
+
+		// If no errors occurred, prepare a successful response
+		result = utils.APIV2Response{
+			StatusCode:    utils.API_SUCCESS_CODE,
+			StatusMessage: "Success",
+			Data:          domain.ToSeaPortDomain(data),
+		}
+		return nil // Indicate success
+	})
+
+	// Check if there was an error during the transaction
+	if err != nil {
+		// Prepare an error response if something went wrong
+		result = utils.APIV2Response{
+			StatusCode:    utils.API_ERROR_CODE,
+			StatusMessage: "Error",
+			Data:          err,
+		}
+	}
+
+	// Return the result of the transaction
+	return result
+}
+```
+
+
+#### Key Differences WithinTransaction & WithTransactionContextTimeout
+
+
+1. Timeout Management:
+
+- `WithTransactionContextTimeout`: Manages both transaction and context timeout internally.
+- `WithinTransaction`: Requires separate context timeout management; transaction timeout is handled externally.
+2. Flexibility:
+- `WithTransactionContextTimeout`: Less flexible for cases where you need different timeout values for transactions and overall request processing.
+- `WithinTransaction`: Provides more flexibility by allowing you to set a timeout for the transaction context separately.
+3. Complexity:
+- `WithTransactionContextTimeout`: Combines timeout handling with transaction management, which may be simpler but less flexible.
+- `WithinTransaction`: Keeps transaction management separate, requiring explicit timeout management but offering more control.
+4. Error Handling:
+- Both methods handle errors similarly by triggering rollbacks on failures. The primary difference is how the timeouts are managed and handled.
+Summary
+If you need to manage timeouts for transactions separately from the overall request timeout, using `WithinTransaction` with an explicitly managed context timeout allows more flexibility and control. If you prefer to encapsulate timeout management within the transaction handling logic itself, `WithTransactionContextTimeout` may simplify your code but with less flexibility.

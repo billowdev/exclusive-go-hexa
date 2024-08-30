@@ -43,7 +43,6 @@ func (s *SystemFieldGroupServiceImpl) DeleteSystemGroupField(ctx context.Context
 
 // GetSystemGroupField implements ports.ISystemGroupFieldService.
 func (s *SystemFieldGroupServiceImpl) GetSystemGroupField(ctx context.Context, id uint) utils.APIResponse {
-
 	data, err := s.repo.GetSystemGroupField(ctx, id)
 	if err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
