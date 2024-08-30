@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
@@ -29,16 +30,36 @@ func NewSystemFieldService(
 
 // CreateSystemField implements ports.ISystemFieldService.
 func (s *SystemFieldServiceImpl) CreateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
-	// tx, err := s.transactor.BeginTransaction()
-	// if err != nil {
-	// 	return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
-	// }
-	// ctxWithTx := database.InjectTx(ctx, tx) // Inject transaction into context
-	if err := s.repo.CreateSystemField(ctx, payload); err != nil {
-		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
+	var result utils.APIResponse
+
+	// Use the WithTransactionContextTimeout function to handle the transaction
+	err := s.transactor.WithTransactionContextTimeout(ctx, 5*time.Second, func(txCtx context.Context) error {
+		// Create the system field entry in the database using the transaction context
+		if err := s.repo.CreateSystemField(txCtx, payload); err != nil {
+			return err // Return error to trigger rollback
+		}
+
+		// If no errors occurred, prepare a successful response
+		result = utils.APIResponse{
+			StatusCode:    configs.API_SUCCESS_CODE,
+			StatusMessage: "Success",
+			Data:          domain.ToSystemFieldDomain(payload),
+		}
+		return nil // Indicate success
+	})
+
+	// Check if there was an error during the transaction
+	if err != nil {
+		// Prepare an error response if something went wrong
+		result = utils.APIResponse{
+			StatusCode:    configs.API_ERROR_CODE,
+			StatusMessage: "Error",
+			Data:          err,
+		}
 	}
-	res := domain.ToSystemFieldDomain(payload)
-	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: res}
+
+	// Return the result of the transaction
+	return result
 }
 
 // DeleteSystemField implements ports.ISystemFieldService.
@@ -92,14 +113,34 @@ func (s *SystemFieldServiceImpl) GetSystemFields(ctx context.Context) pagination
 
 // UpdateSystemField implements ports.ISystemFieldService.
 func (s *SystemFieldServiceImpl) UpdateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
-	// tx, err := s.transactor.BeginTransaction()
-	// if err!= nil {
-	//     return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
-	// }
-	// ctxWithTx := database.InjectTx(ctx, tx) // Inject transaction into context
-	if err := s.repo.UpdateSystemField(ctx, payload); err != nil {
-		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
+	var result utils.APIResponse
+
+	// Use the WithinTransaction function to handle the transaction
+	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+		// Update the system field entry in the database using the transaction context
+		if err := s.repo.UpdateSystemField(txCtx, payload); err != nil {
+			return err // Return error to trigger rollback
+		}
+
+		// If no errors occurred, prepare a successful response
+		result = utils.APIResponse{
+			StatusCode:    configs.API_SUCCESS_CODE,
+			StatusMessage: "Success",
+			Data:          domain.ToSystemFieldDomain(payload),
+		}
+		return nil // Indicate success
+	})
+
+	// Check if there was an error during the transaction
+	if err != nil {
+		// Prepare an error response if something went wrong
+		result = utils.APIResponse{
+			StatusCode:    configs.API_ERROR_CODE,
+			StatusMessage: "Error",
+			Data:          err,
+		}
 	}
-	res := domain.ToSystemFieldDomain(payload)
-	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: res}
+
+	// Return the result of the transaction
+	return result
 }
