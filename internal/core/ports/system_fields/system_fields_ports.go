@@ -21,6 +21,6 @@ type ISystemFieldService interface {
 	GetSystemField(ctx context.Context, id uint) utils.APIResponse
 	GetSystemFields(ctx context.Context) pagination.Pagination[[]domain.SystemFieldDomain]
 	CreateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse
-	UpdateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse
+	UpdateSystemField(ctx context.Context, id uint, payload *models.SystemField) utils.APIResponse
 	DeleteSystemField(ctx context.Context, id uint) utils.APIResponse
 }

@@ -112,9 +112,12 @@ func (s *SystemFieldServiceImpl) GetSystemFields(ctx context.Context) pagination
 }
 
 // UpdateSystemField implements ports.ISystemFieldService.
-func (s *SystemFieldServiceImpl) UpdateSystemField(ctx context.Context, payload *models.SystemField) utils.APIResponse {
+func (s *SystemFieldServiceImpl) UpdateSystemField(ctx context.Context, id uint, payload *models.SystemField) utils.APIResponse {
 	var result utils.APIResponse
-
+	if _, err := s.repo.GetSystemField(ctx, id); err != nil {
+		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Not Found", Data: nil}
+	}
+	payload.ID = id
 	// Use the WithinTransaction function to handle the transaction
 	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
 		// Update the system field entry in the database using the transaction context
