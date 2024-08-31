@@ -31,7 +31,7 @@ func (s *SystemGroupFieldRepositoryImpl) CreateSystemGroupField(ctx context.Cont
 // DeleteSystemGroupField implements ports.ISystemGroupFieldRepository.
 func (s *SystemGroupFieldRepositoryImpl) DeleteSystemGroupField(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, s.db)
-	if err := tx.WithContext(ctx).Delete(&models.SystemGroupField{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.SystemGroupField{}).Error; err != nil {
 		return err
 	}
 	return nil

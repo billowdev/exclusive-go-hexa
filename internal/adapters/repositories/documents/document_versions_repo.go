@@ -31,7 +31,7 @@ func (d *DocumentVersionImpl) CreateDocumentVersion(ctx context.Context, payload
 // DeleteDocumentVersion implements ports.IDocumentVersionRepository.
 func (d *DocumentVersionImpl) DeleteDocumentVersion(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, d.db)
-	if err := tx.WithContext(ctx).Delete(&models.DocumentVersion{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.DocumentVersion{}).Error; err != nil {
 		return err
 	}
 	return nil

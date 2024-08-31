@@ -32,7 +32,7 @@ func (l LogMasterFileRepository) CreateLogMasterFile(ctx context.Context, payloa
 // DeleteLogMasterFile implements ports.ILogMasterFileRepository.
 func (l LogMasterFileRepository) DeleteLogMasterFile(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, l.db)
-	if err := tx.WithContext(ctx).Delete(&models.LogMasterFile{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.LogMasterFile{}).Error; err != nil {
 		return err
 	}
 	return nil

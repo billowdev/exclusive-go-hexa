@@ -31,7 +31,7 @@ func (d *DocumentTemplateFieldImpl) CreateDocumentTemplateField(ctx context.Cont
 // DeleteDocumentTemplateField implements ports.IDocumentTemplateFieldRepository.
 func (d *DocumentTemplateFieldImpl) DeleteDocumentTemplateField(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, d.db)
-	if err := tx.WithContext(ctx).Delete(&models.DocumentTemplateField{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.DocumentTemplateField{}).Error; err != nil {
 		return err
 	}
 	return nil

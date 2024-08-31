@@ -31,7 +31,7 @@ func (c *ConfigSystemMasterFileFieldImpl) CreateConfigSystemMasterFileField(ctx 
 // DeleteConfigSystemMasterFileField implements ports.IConfigSystemMasterFileFieldRepository.
 func (c *ConfigSystemMasterFileFieldImpl) DeleteConfigSystemMasterFileField(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, c.db)
-	if err := tx.WithContext(ctx).Delete(&models.ConfigSystemMasterFileField{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.ConfigSystemMasterFileField{}).Error; err != nil {
 		return err
 	}
 	return nil

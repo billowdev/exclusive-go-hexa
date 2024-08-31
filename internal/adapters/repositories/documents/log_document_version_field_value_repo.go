@@ -31,7 +31,7 @@ func (l *LogDocumentVersionFieldValueImpl) CreateLogDocumentVersionFieldValue(ct
 // DeleteLogDocumentVersionFieldValue implements ports.ILogDocumentVersionFieldValueRepository.
 func (l *LogDocumentVersionFieldValueImpl) DeleteLogDocumentVersionFieldValue(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, l.db)
-	if err := tx.WithContext(ctx).Delete(&models.LogDocumentVersionFieldValue{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.LogDocumentVersionFieldValue{}).Error; err != nil {
 		return err
 	}
 	return nil

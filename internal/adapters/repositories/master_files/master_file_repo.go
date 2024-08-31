@@ -31,7 +31,7 @@ func (m *MasterFileImpl) CreateMasterFile(ctx context.Context, payload *models.M
 // DeleteMasterFile implements ports.IMasterFileRepository.
 func (m *MasterFileImpl) DeleteMasterFile(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, m.db)
-	if err := tx.WithContext(ctx).Delete(&models.MasterFile{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.MasterFile{}).Error; err != nil {
 		return err
 	}
 	return nil

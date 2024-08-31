@@ -31,7 +31,7 @@ func (d *DocumentImpl) CreateDocument(ctx context.Context, payload *models.Docum
 // DeleteDocument implements ports.IDocumentRepository.
 func (d *DocumentImpl) DeleteDocument(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, d.db)
-	if err := tx.WithContext(ctx).Delete(&models.Document{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.Document{}).Error; err != nil {
 		return err
 	}
 	return nil
