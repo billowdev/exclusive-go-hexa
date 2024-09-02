@@ -21,6 +21,6 @@ type ISystemGroupFieldService interface {
 	GetSystemGroupField(ctx context.Context, id uint) utils.APIResponse
 	GetSystemGroupFields(ctx context.Context) pagination.Pagination[[]domain.SystemGroupFieldDomain]
 	CreateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse
-	UpdateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse
+	UpdateSystemGroupField(ctx context.Context, id uint, payload *models.SystemGroupField) utils.APIResponse
 	DeleteSystemGroupField(ctx context.Context, id uint) utils.APIResponse
 }

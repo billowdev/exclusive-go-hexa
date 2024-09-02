@@ -1,9 +1,10 @@
 # The design pattern for repositories adapters
 Three different approaches to handling transactions across multiple repositories
+let's example business context in `Order` and `Document`
 - Abstract Repository Combining Two/Multiple Repositories
 - Transactor Repository (TransactorRepo)
 - Transaction at the Repository Level (BeginTransaction Method)
-Let's explore the pros and cons of each, and I'll provide guidance on which might be the most suitable given your needs.
+Let's explore the pros and cons of each, and I'll provide guidance on which might be the most suitable...
 
 ## Approach 1: Abstract Repository Combining Two/Multiple Repositories (OrderDocumentRepo)
 In this approach, you create an OrderDocumentRepo that combines both the OrderRepo and DocumentRepo into a single abstract repository, managing the transaction within this repository.
