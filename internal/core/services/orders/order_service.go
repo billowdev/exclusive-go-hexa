@@ -72,7 +72,11 @@ func (o *OrderServiceImpl) GetOrders(ctx context.Context) pagination.Pagination[
 }
 
 // UpdateOrder implements ports.IOrderService.
-func (o *OrderServiceImpl) UpdateOrder(ctx context.Context, payload domain.OrderDomain) utils.APIResponse {
+func (o *OrderServiceImpl) UpdateOrder(ctx context.Context, id uint, payload domain.OrderDomain) utils.APIResponse {
+	if _, err := o.repo.GetOrder(ctx, id); err != nil {
+		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Not Found", Data: nil}
+	}
+	payload.ID = id
 	data := domain.ToOrderModel(payload)
 	if err := o.repo.UpdateOrder(ctx, data); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}

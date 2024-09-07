@@ -21,6 +21,6 @@ type IOrderService interface {
 	GetOrder(ctx context.Context, id uint) utils.APIResponse
 	GetOrders(ctx context.Context) pagination.Pagination[[]domain.OrderDomain]
 	CreateOrder(ctx context.Context, payload domain.OrderDomain) utils.APIResponse
-	UpdateOrder(ctx context.Context, payload domain.OrderDomain) utils.APIResponse
+	UpdateOrder(ctx context.Context, id uint, payload domain.OrderDomain) utils.APIResponse
 	DeleteOrder(ctx context.Context, id uint) utils.APIResponse
 }
