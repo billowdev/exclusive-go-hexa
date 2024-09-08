@@ -65,6 +65,10 @@ func (s *SystemFieldImpl) HandleDeleteSystemField(c *fiber.Ctx) error {
 // HandleUpdateSystemField implements ISystemFieldHandler.
 func (s *SystemFieldImpl) HandleUpdateSystemField(c *fiber.Ctx) error {
 	var payload models.SystemField
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.NewErrorResponse(c, "Invalid ID", err.Error())
+	}
 	if err := c.BodyParser(&payload); err != nil {
 		return utils.NewErrorResponse(c, "Invalid request payload", err.Error())
 	}
@@ -73,7 +77,7 @@ func (s *SystemFieldImpl) HandleUpdateSystemField(c *fiber.Ctx) error {
 	if err := ctx.Err(); err != nil {
 		return c.Context().Err()
 	}
-	res := s.systemFieldService.UpdateSystemField(ctx, &payload)
+	res := s.systemFieldService.UpdateSystemField(ctx, uint(id), &payload)
 	return c.JSON(res)
 }
 

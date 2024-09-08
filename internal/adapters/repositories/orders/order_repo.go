@@ -31,7 +31,7 @@ func (o *OrderImpl) CreateOrder(ctx context.Context, payload *models.Order) erro
 // DeleteOrder implements ports.IOrderRepository.
 func (o *OrderImpl) DeleteOrder(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, o.db)
-	if err := tx.WithContext(ctx).Delete(&models.Order{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.Order{}).Error; err != nil {
 		return err
 	}
 	return nil

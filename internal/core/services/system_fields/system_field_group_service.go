@@ -73,7 +73,11 @@ func (s *SystemFieldGroupServiceImpl) GetSystemGroupFields(ctx context.Context) 
 }
 
 // UpdateSystemGroupField implements ports.ISystemGroupFieldService.
-func (s *SystemFieldGroupServiceImpl) UpdateSystemGroupField(ctx context.Context, payload *models.SystemGroupField) utils.APIResponse {
+func (s *SystemFieldGroupServiceImpl) UpdateSystemGroupField(ctx context.Context, id uint, payload *models.SystemGroupField) utils.APIResponse {
+	if _, err := s.repo.GetSystemGroupField(ctx, id); err != nil {
+		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Not Found", Data: nil}
+	}
+	payload.ID = id
 	err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
 		err := s.repo.UpdateSystemGroupField(ctx, payload)
 		if err != nil {

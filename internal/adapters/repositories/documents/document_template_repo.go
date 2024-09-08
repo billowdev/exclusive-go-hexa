@@ -31,7 +31,7 @@ func (d *DocumentTemplateImpl) CreateDocumentTemplate(ctx context.Context, paylo
 // DeleteDocumentTemplate implements ports.IDocumentTemplateRepository.
 func (d *DocumentTemplateImpl) DeleteDocumentTemplate(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, d.db)
-	if err := tx.WithContext(ctx).Delete(&models.DocumentTemplate{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.DocumentTemplate{}).Error; err != nil {
 		return err
 	}
 	return nil

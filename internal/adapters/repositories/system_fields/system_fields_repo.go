@@ -31,7 +31,7 @@ func (s *SystemFieldRepositoryImpl) CreateSystemField(ctx context.Context, paylo
 // DeleteSystemField implements ports.ISystemFieldRepository.
 func (s *SystemFieldRepositoryImpl) DeleteSystemField(ctx context.Context, id uint) error {
 	tx := database.HelperExtractTx(ctx, s.db)
-	if err := tx.WithContext(ctx).Delete(&models.SystemField{}, id).Error; err != nil {
+	if err := tx.WithContext(ctx).Where("id=?", id).Delete(&models.SystemField{}).Error; err != nil {
 		return err
 	}
 	return nil
