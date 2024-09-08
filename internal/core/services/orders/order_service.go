@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database"
-	"github.com/billowdev/exclusive-go-hexa/internal/adapters/database/models"
 	domain "github.com/billowdev/exclusive-go-hexa/internal/core/domain/orders"
 	ports "github.com/billowdev/exclusive-go-hexa/internal/core/ports/orders"
 	"github.com/billowdev/exclusive-go-hexa/pkg/configs"
@@ -25,8 +24,9 @@ func NewOrderService(
 }
 
 // CreateOrder implements ports.IOrderService.
-func (o *OrderServiceImpl) CreateOrder(ctx context.Context, payload *models.Order) utils.APIResponse {
-	if err := o.repo.CreateOrder(ctx, payload); err != nil {
+func (o *OrderServiceImpl) CreateOrder(ctx context.Context, payload domain.OrderDomain) utils.APIResponse {
+	data := domain.ToOrderModel(payload)
+	if err := o.repo.CreateOrder(ctx, data); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
 	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: nil}
@@ -72,10 +72,15 @@ func (o *OrderServiceImpl) GetOrders(ctx context.Context) pagination.Pagination[
 }
 
 // UpdateOrder implements ports.IOrderService.
-func (o *OrderServiceImpl) UpdateOrder(ctx context.Context, payload *models.Order) utils.APIResponse {
-	if err := o.repo.UpdateOrder(ctx, payload); err != nil {
+func (o *OrderServiceImpl) UpdateOrder(ctx context.Context, id uint, payload domain.OrderDomain) utils.APIResponse {
+	if _, err := o.repo.GetOrder(ctx, id); err != nil {
+		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Not Found", Data: nil}
+	}
+	payload.ID = id
+	data := domain.ToOrderModel(payload)
+	if err := o.repo.UpdateOrder(ctx, data); err != nil {
 		return utils.APIResponse{StatusCode: configs.API_ERROR_CODE, StatusMessage: "Error", Data: err}
 	}
-	res := domain.ToOrderDomain(payload)
+	res := domain.ToOrderDomain(data)
 	return utils.APIResponse{StatusCode: configs.API_SUCCESS_CODE, StatusMessage: "Success", Data: res}
 }

@@ -70,8 +70,7 @@ type PaginationInfoSwagger struct {
 
 // PaginationResponse represents the response structure for paginated data.
 type PaginationResponse struct {
-	Code          int            `json:"code"`
-	StatusCode    int            `json:"status_code"`
+	StatusCode    string         `json:"status_code"`
 	StatusMessage string         `json:"status_message"`
 	Data          interface{}    `json:"data"`
 	Pagination    PaginationInfo `json:"pagination"`
